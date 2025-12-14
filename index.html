@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2023年中国各省份经济与人口可视化大屏</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题栏 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>2023年中国经济与人口数据可视化平台</h1>
+            </div>
+            <div class="subtitle">
+                <p>基于2023年GDP、人均GDP与人口密度数据的多维度分析</p>
+                <p class="author">制图人：2023114357 阮文博</p>
+            </div>
+        </header>
+
+        <!-- 导航菜单 -->
+        <nav class="nav">
+            <button class="nav-btn active" data-target="dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</button>
+            <button class="nav-btn" data-target="composite-map"><i class="fas fa-map-marked-alt"></i> 综合专题地图</button>
+            <button class="nav-btn" data-target="region-chart"><i class="fas fa-chart-pie"></i> 区域人均GDP</button>
+            <button class="nav-btn" data-target="density-chart"><i class="fas fa-chart-bar"></i> 区域人口密度排行</button>
+            <button class="nav-btn" data-target="about"><i class="fas fa-info-circle"></i> 项目说明</button>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <main class="main-content">
+            <!-- 仪表盘视图（默认显示） -->
+            <div id="dashboard" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card large">
+                        <h2><i class="fas fa-globe-asia"></i> 综合专题地图</h2>
+                        <div class="card-content">
+                            <p>面状底色表示人口密度，紫色圆点表示人均GDP</p>
+                            <div id="dashboard-map" class="preview-chart"></div>
+                            <button class="view-full-btn" data-target="composite-map">查看完整地图</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h2><i class="fas fa-chart-pie"></i> 区域人均GDP分布</h2>
+                        <div class="card-content">
+                            <p>六大区域及省份人均GDP复合饼图</p>
+                            <div id="dashboard-pie" class="preview-chart"></div>
+                            <button class="view-full-btn" data-target="region-chart">查看详细图表</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h2><i class="fas fa-chart-bar"></i> 区域人口密度排行</h2>
+                        <div class="card-content">
+                            <p>人口密度最高的10个省份/地区</p>
+                            <div id="dashboard-bar" class="preview-chart"></div>
+                            <button class="view-full-btn" data-target="density-chart">查看详细图表</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h2><i class="fas fa-database"></i> 数据概览</h2>
+                        <div class="card-content">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value">34</div>
+                                    <div class="stat-label">省级行政区</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">6</div>
+                                    <div class="stat-label">经济区域</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">数据类型</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">可视化类型</div>
+                                </div>
+                            </div>
+                            <div class="data-source">
+                                <p><strong>数据来源：</strong>2023年中国统计年鉴</p>
+                                <p><strong>更新时间：</strong>2025年12月</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 综合专题地图 -->
+            <div id="composite-map" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-map-marked-alt"></i> 综合专题地图</h2>
+                    <p>面状底色=人口密度，紫色圆点=人均GDP（圆点大小与人均GDP成正比）</p>
+                </div>
+                <div class="chart-container full-width">
+                    <iframe src="charts/composite-map.html" frameborder="0" id="composite-map-frame"></iframe>
+                </div>
+            </div>
+
+            <!-- 区域人均GDP饼图 -->
+            <div id="region-chart" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-pie"></i> 2023年中国六大区域-省份人均GDP分布</h2>
+                    <p>点击区域查看省份详情，点击任意位置返回区域视图</p>
+                </div>
+                <div class="chart-container">
+                    <iframe src="charts/region-gdp-pie.html" frameborder="0" id="region-chart-frame"></iframe>
+                </div>
+            </div>
+
+            <!-- 人口密度条形图 -->
+            <div id="density-chart" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> 2023年中国各省份人口密度自定义表</h2>
+                    <p>单位：人/平方公里</p>
+                </div>
+                <div class="chart-container">
+                    <iframe src="charts/density-bar.html" frameborder="0" id="density-chart-frame"></iframe>
+                </div>
+            </div>
+
+            <!-- 项目说明 -->
+            <div id="about" class="content-section">
+                <div class="about-content">
+                    <h2><i class="fas fa-info-circle"></i> 项目说明</h2>
+                    <div class="about-card">
+                        <h3>项目背景</h3>
+                        <p>本项目基于2023年中国各省份GDP、人口及面积数据，通过多种可视化方式展现中国各地区经济发展水平与人口分布特征。</p>
+                    </div>
+                    
+                    <div class="about-card">
+                        <h3>数据来源</h3>
+                        <ul>
+                            <li>2023年中国统计年鉴</li>
+                            <li>国家统计局公开数据</li>
+                            <li>各省份统计公报</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="about-card">
+                        <h3>可视化技术</h3>
+                        <div class="tech-grid">
+                            <div class="tech-item">
+                                <i class="fas fa-map"></i>
+                                <h4>ECharts</h4>
+                                <p>开源可视化库，用于创建地图和图表</p>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-code"></i>
+                                <h4>HTML5/CSS3</h4>
+                                <p>响应式网页设计，适配多种设备</p>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <h4>JavaScript</h4>
+                                <p>实现交互功能和动态效果</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-card">
+                        <h3>专题地图说明</h3>
+                        <div class="map-legend">
+                            <img src="images/2023114357阮文博专题地图.jpg" alt="专题地图" class="map-image">
+                            <div class="legend-info">
+                                <h4>图例说明</h4>
+                                <ul>
+                                    <li><span class="color-box" style="background-color: #0099FF;"></span> 人口密度：0-100人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #33CC33;"></span> 人口密度：101-200人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FFFF00;"></span> 人口密度：201-300人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FF9900;"></span> 人口密度：301-600人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FF3333;"></span> 人口密度：601+人/平方公里</li>
+                                    <li><span class="color-dot" style="background-color: #d00080;"></span> 人均GDP圆点（大小与数值成正比）</li>
+                                </ul>
+                                <p class="note">注：九段线表示中国南海疆界，是中华人民共和国的固有领土。</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-card">
+                        <h3>作者信息</h3>
+                        <p><strong>制图人：</strong>2023114357 阮文博</p>
+                        <p><strong>联系方式：</strong>如需获取源码或数据，请访问GitHub项目页面</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>© 2025 中国数据可视化项目 | 数据来源：中国统计年鉴 | 可视化工具：ECharts</p>
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="#" id="fullscreen-btn"><i class="fas fa-expand"></i> 全屏</a>
+                <a href="#" id="reset-view-btn"><i class="fas fa-redo"></i> 重置视图</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

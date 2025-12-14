@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式中国人口密度可视化</title>
+    
+    <!-- ECharts核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <!-- 引入jQuery用于DOM操作简化 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* 容器包装，限制最大宽度 */
+        .container-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        /* 控制面板 */
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .control-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .control-section:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .control-section h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .control-btn.small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .control-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 10px rgba(240, 147, 251, 0.3);
+        }
+        
+        .control-btn.secondary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+        }
+        
+        .control-btn.secondary:hover {
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        /* 省份选择区域 */
+        .province-selector {
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #eaeaea;
+        }
+        
+        .province-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        
+        .province-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .province-item:hover {
+            background: #e9ecef;
+        }
+        
+        .province-item.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .province-item.highlight.selected {
+         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+         color: white;
+        }
+        
+        .province-checkbox {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid #adb5bd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .province-item.selected .province-checkbox,
+        .province-item.highlight .province-checkbox {
+            border-color: white;
+            background: white;
+        }
+        
+        .province-item.selected .province-checkbox::after,
+        .province-item.highlight.selected .province-checkbox::after {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .province-name {
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #densityChart {
+            flex: 1;
+            min-height: 500px;
+            width: 100%;
+        }
+        
+        /* 统计信息 */
+        .stats-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #4facfe;
+        }
+        
+        .stat-card.highlight {
+            border-left-color: #f093fb;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .stat-detail {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 5px;
+        }
+        
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header .subtitle {
+                font-size: 14px;
+            }
+            
+            .control-panel {
+                padding: 12px;
+            }
+            
+            .province-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .province-name {
+                font-size: 12px;
+            }
+            
+            .control-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+            }
+            
+            #densityChart {
+                min-height: 400px;
+            }
+            
+            .stats-info {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .chart-container {
+                padding: 10px;
+            }
+            
+            .province-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .control-buttons {
+                justify-content: center;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1100px;
+            }
+            
+            .chart-container {
+                min-height: 550px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>交互式中国人口密度可视化</h1>
+                <div class="subtitle">自定义选择省份，探索中国各地区人口分布特征</div>
+                
+                <div class="control-panel">
+                    <div class="control-section">
+                        <h3><i class="icon">🌏</i> 显示模式</h3>
+                        <div class="control-buttons">
+                            <button class="control-btn active" id="modeCustom">
+                                <i class="icon">🎯</i> 自定义选择模式
+                            </button>
+                            <button class="control-btn secondary" id="modeTop10">
+                                <i class="icon">📊</i> Top10排名模式
+                            </button>
+                            <button class="control-btn secondary" id="modeExcludeHKMO">
+                                <i class="icon">🚫</i> 排除港澳模式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-section">
+                        <h3><i class="icon">📍</i> 省份选择</h3>
+                        <div class="control-buttons">
+                            <button class="control-btn small" id="selectTop5">
+                                <i class="icon">⭐</i> 选择前5名
+                            </button>
+                            <button class="control-btn small" id="selectTop10">
+                                <i class="icon">🔥</i> 选择前10名
+                            </button>
+                            <button class="control-btn small" id="selectAll">
+                                <i class="icon">✅</i> 选择全部省份
+                            </button>
+                            <button class="control-btn small" id="clearSelection">
+                                <i class="icon">🗑️</i> 清除选择
+                            </button>
+                        </div>
+                        
+                        <div class="province-selector">
+                            <div class="province-grid" id="provinceGrid">
+                                <!-- 省份选项将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div id="densityChart"></div>
+            </div>
+            
+            <div class="stats-info">
+                <div class="stat-card">
+                    <div class="stat-value" id="selectedCount">0</div>
+                    <div class="stat-label">已选择省份数量</div>
+                    <div class="stat-detail">共34个省级行政区</div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="stat-value" id="maxDensity">0</div>
+                    <div class="stat-label">最高人口密度</div>
+                    <div class="stat-detail" id="maxProvince">单位：人/平方公里</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgDensity">0</div>
+                    <div class="stat-label">平均人口密度</div>
+                    <div class="stat-detail">所选省份的平均值</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="minDensity">0</div>
+                    <div class="stat-label">最低人口密度</div>
+                    <div class="stat-detail" id="minProvince">单位：人/平方公里</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>数据来源：2023年中国统计年鉴 | 制图：阮文博 | 使用ECharts绘制</p>
+                <p>提示：点击省份可快速切换选择状态，双击图表中的柱形可查看详细数据</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        var myChart = echarts.init(document.getElementById('densityChart'));
+        
+        // 所有省份的人口密度数据（包含港澳台，按人口密度从高到低排序）
+        var allProvinceData = [
+            { name: '澳门', value: 20718.18, isSpecial: true },
+            { name: '香港', value: 6730.79, isSpecial: true },
+            { name: '上海', value: 2975.83, isSpecial: false },
+            { name: '北京', value: 1332.32, isSpecial: false },
+            { name: '天津', value: 1144.58, isSpecial: false },
+            { name: '江苏', value: 799.81, isSpecial: false },
+            { name: '广东', value: 707.24, isSpecial: false },
+            { name: '山东', value: 641.10, isSpecial: false },
+            { name: '浙江', value: 628.12, isSpecial: false },
+            { name: '河南', value: 592.46, isSpecial: false },
+            { name: '安徽', value: 436.78, isSpecial: false },
+            { name: '重庆', value: 387.43, isSpecial: false },
+            { name: '河北', value: 392.11, isSpecial: false },
+            { name: '湖北', value: 313.98, isSpecial: false },
+            { name: '湖南', value: 310.05, isSpecial: false },
+            { name: '福建', value: 337.47, isSpecial: false },
+            { name: '辽宁', value: 281.85, isSpecial: false },
+            { name: '江西', value: 270.46, isSpecial: false },
+            { name: '海南', value: 296.56, isSpecial: false },
+            { name: '山西', value: 221.19, isSpecial: false },
+            { name: '贵州', value: 219.48, isSpecial: false },
+            { name: '广西', value: 211.57, isSpecial: false },
+            { name: '陕西', value: 192.20, isSpecial: false },
+            { name: '四川', value: 172.14, isSpecial: false },
+            { name: '宁夏', value: 140.48, isSpecial: false },
+            { name: '吉林', value: 122.35, isSpecial: false },
+            { name: '云南', value: 121.95, isSpecial: false },
+            { name: '甘肃', value: 57.89, isSpecial: false },
+            { name: '黑龙江', value: 67.66, isSpecial: false },
+            { name: '内蒙古', value: 20.92, isSpecial: false },
+            { name: '新疆', value: 15.92, isSpecial: false },
+            { name: '青海', value: 8.53, isSpecial: false },
+            { name: '西藏', value: 3.04, isSpecial: false },
+            { name: '台湾', value: 647.03, isSpecial: false }
+        ];
+        
+        // 初始选择状态：默认选择前10名
+        var selectedProvinces = allProvinceData.slice(0, 10).map(item => item.name);
+        
+        // 当前显示模式：'custom'（自定义）, 'top10'（Top10排名）, 'excludeHKMO'（排除港澳）
+        var currentMode = 'custom';
+        
+        // 初始化省份选择器
+        function initProvinceSelector() {
+            var provinceGrid = $('#provinceGrid');
+            provinceGrid.empty();
+            
+            allProvinceData.forEach(function(province, index) {
+                var isSelected = selectedProvinces.includes(province.name);
+                var isSpecial = province.isSpecial;
+                
+                var provinceItem = $('<div class="province-item"></div>');
+                if (isSelected) provinceItem.addClass('selected');
+                if (isSpecial) provinceItem.addClass('highlight');
+                
+                provinceItem.html(`
+                    <div class="province-checkbox"></div>
+                    <div class="province-name">${province.name}</div>
+                `);
+                
+                // 点击切换选择状态
+                provinceItem.click(function() {
+                    var provinceName = province.name;
+                    
+                    if (selectedProvinces.includes(provinceName)) {
+                        // 如果已选择，则移除
+                        selectedProvinces = selectedProvinces.filter(name => name !== provinceName);
+                        $(this).removeClass('selected');
+                    } else {
+                        // 如果未选择，则添加
+                        selectedProvinces.push(provinceName);
+                        $(this).addClass('selected');
+                    }
+                    
+                    updateChart();
+                    updateStats();
+                });
+                
+                provinceGrid.append(provinceItem);
+            });
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            var selectedData = allProvinceData.filter(p => selectedProvinces.includes(p.name));
+            
+            if (selectedData.length === 0) {
+                $('#selectedCount').text('0');
+                $('#maxDensity').text('0');
+                $('#avgDensity').text('0');
+                $('#minDensity').text('0');
+                $('#maxProvince').text('单位：人/平方公里');
+                $('#minProvince').text('单位：人/平方公里');
+                return;
+            }
+            
+            // 计算统计数据
+            var maxDensity = Math.max(...selectedData.map(d => d.value));
+            var minDensity = Math.min(...selectedData.map(d => d.value));
+            var avgDensity = selectedData.reduce((sum, d) => sum + d.value, 0) / selectedData.length;
+            
+            var maxProvince = selectedData.find(d => d.value === maxDensity).name;
+            var minProvince = selectedData.find(d => d.value === minDensity).name;
+            
+            // 更新DOM
+            $('#selectedCount').text(selectedData.length);
+            $('#maxDensity').text(maxDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 }));
+            $('#minDensity').text(minDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 }));
+            $('#avgDensity').text(avgDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 }));
+            $('#maxProvince').text(`${maxProvince} (最高)`);
+            $('#minProvince').text(`${minProvince} (最低)`);
+        }
+        
+        // 根据当前选择生成图表数据
+        function getChartData() {
+            // 获取选中的省份数据
+            var selectedData = allProvinceData.filter(p => selectedProvinces.includes(p.name));
+            
+            // 按人口密度从高到低排序
+            selectedData.sort((a, b) => b.value - a.value);
+            
+            // 提取名称和数值数组
+            var provinces = selectedData.map(d => d.name);
+            var values = selectedData.map(d => d.value);
+            
+            // 生成颜色数组 - 使用渐变色，根据密度值分配颜色
+            var colors = [];
+            if (selectedData.length > 0) {
+                var maxValue = Math.max(...values);
+                var minValue = Math.min(...values);
+                
+                // 对于包含港澳的情况，使用特殊的颜色处理
+                var hasSpecial = selectedData.some(d => d.isSpecial);
+                
+                if (hasSpecial && maxValue > 3000) {
+                    // 包含港澳的情况：使用分段颜色
+                    selectedData.forEach(d => {
+                        if (d.isSpecial) {
+                            colors.push('#FF0000'); // 港澳用红色
+                        } else if (d.value > 600) {
+                            colors.push('#FF6B6B'); // 高密度用橙红色
+                        } else if (d.value > 300) {
+                            colors.push('#FFD166'); // 中高密度用黄色
+                        } else if (d.value > 100) {
+                            colors.push('#06D6A0'); // 中密度用绿色
+                        } else {
+                            colors.push('#118AB2'); // 低密度用蓝色
+                        }
+                    });
+                } else {
+                    // 不包含港澳或数值范围较小：使用连续渐变
+                    selectedData.forEach(d => {
+                        var ratio = (d.value - minValue) / (maxValue - minValue);
+                        
+                        // 从蓝色到红色的渐变
+                        var r = Math.floor(255 * ratio);
+                        var g = Math.floor(100 * (1 - ratio));
+                        var b = Math.floor(255 * (1 - ratio));
+                        
+                        colors.push(`rgb(${r}, ${g}, ${b})`);
+                    });
+                }
+            }
+            
+            return {
+                provinces: provinces,
+                values: values,
+                colors: colors,
+                data: selectedData
+            };
+        }
+        
+        // 创建图表配置
+        function createChartOption() {
+            var chartData = getChartData();
+            var containerWidth = document.getElementById('densityChart').offsetWidth;
+            
+            // 根据容器大小动态调整
+            var isSmallScreen = containerWidth < 768;
+            var titleFontSize = Math.max(14, Math.min(20, containerWidth / 30));
+            var labelFontSize = Math.max(10, Math.min(14, containerWidth / 40));
+            
+            // 根据当前模式设置标题
+            var titleText = '';
+            var subtitleText = '单位：人/平方公里';
+            
+            switch(currentMode) {
+                case 'top10':
+                    titleText = '2023年中国各省份人口密度自定义表';
+                    subtitleText = '包含港澳地区 | 单位：人/平方公里';
+                    break;
+                case 'excludeHKMO':
+                    titleText = '2023年中国各省份人口密度排名（排除港澳）';
+                    subtitleText = '不含港澳地区 | 单位：人/平方公里';
+                    break;
+                case 'custom':
+                default:
+                    titleText = `自定义选择 - ${chartData.provinces.length}个省份人口密度对比`;
+                    subtitleText = '已选择' + chartData.provinces.length + '个省份 | 单位：人/平方公里';
+                    break;
+            }
+            
+            return {
+                title: {
+                    text: titleText,
+                    subtext: subtitleText,
+                    left: 'center',
+                    textStyle: { 
+                        fontSize: titleFontSize, 
+                        fontWeight: 'bold',
+                        color: '#2c3e50'
+                    },
+                    subtextStyle: { 
+                        fontSize: labelFontSize - 2, 
+                        color: '#7f8c8d' 
+                    },
+                    top: 10
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { 
+                        type: 'shadow',
+                        shadowStyle: {
+                            color: 'rgba(150, 150, 150, 0.2)'
+                        }
+                    },
+                    formatter: function(params) {
+                        var data = params[0];
+                        var value = data.value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        var densityLevel = '';
+                        
+                        if (data.value > 3000) {
+                            densityLevel = '<span style="color:#FF0000;font-weight:bold"> (极高密度)</span>';
+                        } else if (data.value > 600) {
+                            densityLevel = '<span style="color:#FF6B6B;font-weight:bold"> (高密度)</span>';
+                        } else if (data.value > 300) {
+                            densityLevel = '<span style="color:#FFD166;font-weight:bold"> (中高密度)</span>';
+                        } else if (data.value > 100) {
+                            densityLevel = '<span style="color:#06D6A0;font-weight:bold"> (中密度)</span>';
+                        } else {
+                            densityLevel = '<span style="color:#118AB2;font-weight:bold"> (低密度)</span>';
+                        }
+                        
+                        return `<div style="font-weight: bold; margin-bottom: 5px;">${data.name}</div>
+                               <div>人口密度: <span style="color: #e74c3c; font-weight: bold">${value}</span> 人/平方公里${densityLevel}</div>`;
+                    },
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    textStyle: { fontSize: labelFontSize }
+                },
+                grid: { 
+                    left: isSmallScreen ? '12%' : '8%', 
+                    right: '5%', 
+                    bottom: isSmallScreen ? '15%' : '10%', 
+                    top: isSmallScreen ? '20%' : '18%',
+                    containLabel: true 
+                },
+                xAxis: {
+                    type: 'category',
+                    data: chartData.provinces,
+                    axisLabel: { 
+                        rotate: isSmallScreen ? 45 : 30, 
+                        interval: 0,
+                        fontSize: labelFontSize - 1,
+                        color: '#555'
+                    },
+                    axisLine: { 
+                        lineStyle: { 
+                            color: '#ccc',
+                            width: 1
+                        } 
+                    },
+                    axisTick: {
+                        alignWithLabel: true,
+                        lineStyle: {
+                            color: '#ccc'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '人口密度（人/平方公里）',
+                    nameTextStyle: { 
+                        color: '#666',
+                        fontSize: labelFontSize - 1,
+                        padding: [0, 0, 0, 5]
+                    },
+                    axisLine: { 
+                        lineStyle: { 
+                            color: '#ccc',
+                            width: 1
+                        } 
+                    },
+                    splitLine: { 
+                        lineStyle: { 
+                            color: '#f0f0f0',
+                            type: 'dashed'
+                        } 
+                    },
+                    axisLabel: {
+                        fontSize: labelFontSize - 1,
+                        color: '#666'
+                    },
+                    scale: chartData.data.some(d => d.isSpecial) // 如果包含港澳，则使用缩放
+                },
+                series: [{
+                    name: '人口密度',
+                    type: 'bar',
+                    data: chartData.values.map((value, index) => ({
+                        value: value,
+                        itemStyle: {
+                            color: chartData.colors[index]
+                        }
+                    })),
+                    barWidth: isSmallScreen ? '50%' : '65%',
+                    itemStyle: {
+                        borderRadius: [6, 6, 0, 0],
+                        borderWidth: 0
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.3)'
+                        }
+                    },
+                    label: {
+                        show: !isSmallScreen,
+                        position: 'top',
+                        fontSize: labelFontSize - 1,
+                        color: '#555',
+                        formatter: function(params) {
+                            // 如果数值过大，显示简写形式
+                            if (params.value > 10000) {
+                                return (params.value / 10000).toFixed(1) + '万';
+                            } else if (params.value > 1000) {
+                                return (params.value / 1000).toFixed(1) + '千';
+                            } else {
+                                return params.value.toFixed(0);
+                            }
+                        }
+                    }
+                }]
+            };
+        }
+        
+        // 更新图表
+        function updateChart() {
+            myChart.setOption(createChartOption(), true);
+        }
+        
+        // 模式切换函数
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // 更新按钮状态
+            $('#modeCustom').removeClass('active');
+            $('#modeTop10').removeClass('active');
+            $('#modeExcludeHKMO').removeClass('active');
+            
+            $('#' + 'mode' + mode.charAt(0).toUpperCase() + mode.slice(1)).addClass('active');
+            
+            // 根据模式更新选择
+            switch(mode) {
+                case 'top10':
+                    // Top10排名模式：选择人口密度最高的10个省份
+                    selectedProvinces = allProvinceData.slice(0, 10).map(p => p.name);
+                    break;
+                    
+                case 'excludeHKMO':
+                    // 排除港澳模式：选择所有非港澳省份中人口密度最高的10个
+                    var nonSpecialProvinces = allProvinceData.filter(p => !p.isSpecial);
+                    selectedProvinces = nonSpecialProvinces.slice(0, 10).map(p => p.name);
+                    break;
+                    
+                case 'custom':
+                default:
+                    // 自定义模式：保持当前选择
+                    break;
+            }
+            
+            // 更新选择器UI
+            updateProvinceSelectorUI();
+            updateChart();
+            updateStats();
+        }
+        
+        // 更新省份选择器UI
+        function updateProvinceSelectorUI() {
+            $('.province-item').each(function() {
+                var provinceName = $(this).find('.province-name').text();
+                
+                $(this).removeClass('selected');
+                if (selectedProvinces.includes(provinceName)) {
+                    $(this).addClass('selected');
+                }
+            });
+        }
+        
+        // 初始化事件监听
+        function initEventListeners() {
+            // 模式切换按钮
+            $('#modeCustom').click(function() { switchMode('custom'); });
+            $('#modeTop10').click(function() { switchMode('top10'); });
+            $('#modeExcludeHKMO').click(function() { switchMode('excludeHKMO'); });
+            
+            // 快速选择按钮
+            $('#selectTop5').click(function() {
+                selectedProvinces = allProvinceData.slice(0, 5).map(p => p.name);
+                updateProvinceSelectorUI();
+                updateChart();
+                updateStats();
+            });
+            
+            $('#selectTop10').click(function() {
+                selectedProvinces = allProvinceData.slice(0, 10).map(p => p.name);
+                updateProvinceSelectorUI();
+                updateChart();
+                updateStats();
+            });
+            
+            $('#selectAll').click(function() {
+                selectedProvinces = allProvinceData.map(p => p.name);
+                updateProvinceSelectorUI();
+                updateChart();
+                updateStats();
+            });
+            
+            $('#clearSelection').click(function() {
+                selectedProvinces = [];
+                updateProvinceSelectorUI();
+                updateChart();
+                updateStats();
+            });
+            
+            // 图表点击事件：点击柱形可切换该省份的选择状态
+            myChart.on('click', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'bar') {
+                    var provinceName = params.name;
+                    
+                    if (selectedProvinces.includes(provinceName)) {
+                        selectedProvinces = selectedProvinces.filter(name => name !== provinceName);
+                    } else {
+                        selectedProvinces.push(provinceName);
+                    }
+                    
+                    updateProvinceSelectorUI();
+                    updateChart();
+                    updateStats();
+                }
+            });
+            
+            // 窗口自适应
+            var resizeTimer;
+            $(window).resize(function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    myChart.resize();
+                }, 200);
+            });
+        }
+        
+        // 初始化
+        $(document).ready(function() {
+            initProvinceSelector();
+            initEventListeners();
+            updateChart();
+            updateStats();
+            
+            // 默认切换到Top10模式
+            switchMode('top10');
+        });
+    </script>
+</body>
+</html>

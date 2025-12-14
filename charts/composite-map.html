@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国各省份经济与人口分布专题地图</title>
+    
+    <!-- ECharts核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <!-- 中国地图数据 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* 限制最大宽度，防止过度拉伸 */
+        .container-wrapper {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 900px; /* 限制容器最大宽度 */
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #d00080, #700080);
+            border: 3px solid white;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        
+        .control-btn.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .control-btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+        }
+        
+        .control-btn.tertiary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .control-btn.tertiary:hover {
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        
+        .map-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #map {
+            flex: 1;
+            min-height: 500px;
+            width: 100%;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px dotted white;
+        }
+        
+        .footer a:hover {
+            border-bottom: 1px solid white;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header .subtitle {
+                font-size: 14px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .controls {
+                gap: 8px;
+            }
+            
+            .control-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .map-container {
+                padding: 15px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .map-container {
+                padding: 10px;
+            }
+        }
+        
+        /* 新增：大屏幕优化 */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1100px;
+            }
+            
+            .map-container {
+                min-height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>2023年中国各省份经济与人口分布专题地图</h1>
+                <div class="subtitle">
+                    <div class="legend-item">
+                        <div class="color-dot"></div>
+                        <span>紫色圆点：人均GDP（圆点越大表示人均GDP越高）</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="color-box" style="background: linear-gradient(90deg, #0099FF, #33CC33, #FFFF00, #FF9900, #FF3333)"></div>
+                        <span>面状底色：人口密度（颜色越红表示人口密度越高）</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="control-btn" id="toggleLabel">
+                        <i class="icon">🗺️</i> 隐藏省份名称
+                    </button>
+                    <button class="control-btn secondary" id="togglePoint">
+                        <i class="icon">🔘</i> 隐藏人均GDP圆点
+                    </button>
+                    <button class="control-btn tertiary" id="switchLegend">
+                        <i class="icon">📊</i> 切换：滑动条图例
+                    </button>
+                    <button class="control-btn" id="resetMap">
+                        <i class="icon">🔄</i> 重置视图
+                    </button>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="maxDensity">20,718</div>
+                    <div class="stat-label">最高人口密度 (人/平方公里)</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="maxGDP">483,984</div>
+                    <div class="stat-label">最高人均GDP (元/人)</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="avgDensity">592</div>
+                    <div class="stat-label">平均人口密度 (人/平方公里)</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">34</div>
+                    <div class="stat-label">省级行政区总数</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>数据来源：2023年中国统计年鉴 | 制图：阮文博 | 使用ECharts绘制</p>
+                <p>提示：点击地图上的省份查看详细数据，拖动图例可调整显示范围</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        var myChart = echarts.init(document.getElementById('map'));
+        
+        // 基础数据（包含经纬度信息）
+        var densityData = [
+            { name: '北京', value: 1332.32, gdp: 200204.50, center: [116.46, 39.92] },
+            { name: '天津', value: 1144.58, gdp: 122707.48, center: [117.2, 39.13] },
+            { name: '河北', value: 392.11, gdp: 59440.15, center: [114.48, 38.03] },
+            { name: '山西', value: 221.19, gdp: 74143.84, center: [112.53, 37.87] },
+            { name: '内蒙古', value: 20.92, gdp: 102783.81, center: [111.65, 40.82] },
+            { name: '辽宁', value: 281.85, gdp: 72236.73, center: [123.43, 41.8] },
+            { name: '吉林', value: 122.35, gdp: 57840.43, center: [125.35, 43.88] },
+            { name: '黑龙江', value: 67.66, gdp: 51874.27, center: [126.63, 45.75] },
+            { name: '上海', value: 2975.83, gdp: 189823.76, center: [121.48, 31.22] },
+            { name: '江苏', value: 799.81, gdp: 150389.63, center: [118.78, 32.04] },
+            { name: '浙江', value: 628.12, gdp: 124570.70, center: [120.19, 30.26] },
+            { name: '安徽', value: 436.78, gdp: 76867.51, center: [117.27, 31.86] },
+            { name: '福建', value: 337.47, gdp: 129942.62, center: [119.3, 26.08] },
+            { name: '江西', value: 270.46, gdp: 71317.89, center: [115.85, 28.68] },
+            { name: '山东', value: 641.10, gdp: 90950.58, center: [117.0, 36.65] },
+            { name: '河南', value: 592.46, gdp: 60246.96, center: [113.65, 34.76] },
+            { name: '湖北', value: 313.98, gdp: 95586.90, center: [114.31, 30.52] },
+            { name: '湖南', value: 310.05, gdp: 76146.24, center: [113.0, 28.21] },
+            { name: '广东', value: 707.24, gdp: 106778.81, center: [113.23, 23.16] },
+            { name: '广西', value: 211.57, gdp: 54112.57, center: [108.33, 22.84] },
+            { name: '海南', value: 296.56, gdp: 72384.08, center: [110.35, 20.02] },
+            { name: '重庆', value: 387.43, gdp: 94458.57, center: [106.55, 29.57] },
+            { name: '四川', value: 172.14, gdp: 71860.54, center: [104.06, 30.67] },
+            { name: '贵州', value: 219.48, gdp: 54109.31, center: [106.71, 26.57] },
+            { name: '云南', value: 121.95, gdp: 64243.53, center: [102.73, 25.04] },
+            { name: '西藏', value: 3.04, gdp: 65552.60, center: [91.11, 29.97] },
+            { name: '陕西', value: 192.20, gdp: 85491.07, center: [108.95, 34.27] },
+            { name: '甘肃', value: 57.89, gdp: 48119.64, center: [103.73, 36.03] },
+            { name: '青海', value: 8.53, gdp: 63957.91, center: [101.74, 36.56] },
+            { name: '宁夏', value: 140.48, gdp: 72908.09, center: [106.27, 38.47] },
+            { name: '新疆', value: 15.92, gdp: 73617.82, center: [87.68, 43.77] },
+            { name: '香港', value: 6730.79, gdp: 359117.64, center: [114.17, 22.28] },
+            { name: '澳门', value: 20718.18, gdp: 483984.20, center: [113.55, 22.19] },
+            { name: '台湾', value: 647.03, gdp: 227467.53, center: [121.5, 25.03] }
+        ];
+        
+        // 计算统计数据
+        function calculateStats() {
+            let maxDensity = Math.max(...densityData.map(d => d.value));
+            let maxGDP = Math.max(...densityData.map(d => d.gdp));
+            let avgDensity = densityData.reduce((sum, d) => sum + d.value, 0) / densityData.length;
+            
+            document.getElementById('maxDensity').textContent = maxDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+            document.getElementById('maxGDP').textContent = maxGDP.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+            document.getElementById('avgDensity').textContent = avgDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+        }
+        
+        // 计算圆点大小
+        function getPointSize(gdpValue) {
+            const containerWidth = document.getElementById('map').offsetWidth;
+            // 根据容器宽度调整，但限制最小和最大值
+            const baseSize = Math.max(10, Math.min(30, containerWidth / 50));
+            const minGdp = 48000;
+            const maxGdp = 485000;
+            const normalized = (gdpValue - minGdp) / (maxGdp - minGdp);
+            return normalized * baseSize + 5;
+        }
+        
+        // 准备散点图数据
+        var pointData = densityData.map(item => ({
+            name: item.name,
+            value: item.center.concat([item.gdp]),
+            gdp: item.gdp,
+            density: item.value
+        }));
+        
+        // 图例配置
+        var discreteLegend = {
+            type: 'piecewise',
+            seriesIndex: 0,
+            pieces: [
+                { min: 0, max: 100, label: '0-100人/平方公里', color: '#0099FF' },
+                { min: 101, max: 200, label: '101-200人/平方公里', color: '#33CC33' },
+                { min: 201, max: 300, label: '201-300人/平方公里', color: '#FFFF00' },
+                { min: 301, max: 600, label: '301-600人/平方公里', color: '#FF9900' },
+                { min: 601, max: 21000, label: '601+人/平方公里', color: '#FF3333' }
+            ],
+            left: 20,
+            bottom: 20,
+            textStyle: { fontSize: 12, color: '#333' },
+            orient: 'vertical',
+            itemWidth: 18,
+            itemHeight: 12,
+            itemGap: 5,
+            backgroundColor: 'rgba(255,255,255,0.8)',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            padding: [10, 10],
+            borderRadius: 8
+        };
+        
+        // 修改连续图例：使用非线性映射，让低密度区域显示更明显
+        var continuousLegend = {
+    type: 'continuous',
+    seriesIndex: 0,
+    min: 0,
+    max: 800, // 关键修改：从21000改为800，聚焦主流数据范围（避开澳门极值）
+    range: [0, 800], // 初始范围聚焦在0-800区间，让大部分省份有颜色区分
+    left: 20,
+    bottom: 20,
+    text: ['高人口密度', '低人口密度'],
+    textStyle: { fontSize: 12, color: '#333' },
+    orient: 'vertical',
+    // 关键修改：改用continuous支持的线性渐变颜色数组格式
+    inRange: {
+        color: ['#0099FF', '#33CC33', '#FFFF00', '#FF9900', '#FF3333']
+    },
+    itemWidth: 20,
+    itemHeight: 180,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    padding: [10, 10],
+    borderRadius: 8,
+    calculable: true,
+    // 保留原有格式化逻辑
+    formatter: function(value) {
+        if (value > 3000) {
+            return '极高密度区（港澳）';
+        } else if (value >= 600) {
+            return '高密度区 (' + Math.round(value) + '人/平方公里)';
+        } else {
+            return Math.round(value) + '人/平方公里';
+        }
+    }
+};
+        
+        // 创建图表配置
+        var createOption = function() {
+            var containerWidth = document.getElementById('map').offsetWidth;
+            var containerHeight = document.getElementById('map').offsetHeight;
+            
+            // 根据容器宽度调整
+            var isSmallScreen = containerWidth < 768; // 调整为768px作为小屏幕阈值
+            var labelFontSize = Math.max(8, Math.min(14, containerWidth / 60)); // 调整字体大小计算
+            
+            // 调整图例位置
+            var legendConfig = isContinuousLegend ? Object.assign({}, continuousLegend) : Object.assign({}, discreteLegend);
+            if (isSmallScreen) {
+                legendConfig.orient = 'horizontal';
+                legendConfig.left = 'center';
+                legendConfig.bottom = 10;
+                legendConfig.top = undefined;
+                
+                if (isContinuousLegend) {
+                    legendConfig.itemHeight = 15;
+                    legendConfig.itemWidth = Math.min(300, containerWidth * 0.8);
+                }
+            } else {
+                // 大屏幕时固定图例大小和位置
+                if (isContinuousLegend) {
+                    legendConfig.itemHeight = 180;
+                    legendConfig.itemWidth = 20;
+                }
+            }
+            
+            return {
+                title: {
+                    text: '',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 14
+                    },
+                    formatter: function(params) {
+                        if (params.seriesType === 'map') {
+                            var dataItem = densityData.find(item => item.name === params.name);
+                            if (dataItem) {
+                                return `<div style="font-weight: bold; margin-bottom: 5px;">${params.name}</div>
+                                        <div>人口密度: <span style="color: #e74c3c; font-weight: bold">${dataItem.value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span> 人/平方公里</div>
+                                        <div>人均GDP: <span style="color: #9b59b6; font-weight: bold">¥${dataItem.gdp.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span> 元</div>`;
+                            }
+                        } else if (params.seriesType === 'scatter') {
+                            return `<div style="font-weight: bold; margin-bottom: 5px;">${params.name}</div>
+                                    <div>人均GDP: <span style="color: #9b59b6; font-weight: bold">¥${params.data.gdp.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span> 元</div>
+                                    <div>人口密度: <span style="color: #e74c3c; font-weight: bold">${params.data.density.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span> 人/平方公里</div>`;
+                        }
+                        return params.name;
+                    }
+                },
+                visualMap: legendConfig,
+                geo: {
+                    map: 'china',
+                    roam: false,
+                    label: {
+                        show: labelShow,
+                        fontSize: labelFontSize,
+                        color: '#333',
+                        fontWeight: 'bold'
+                    },
+                    itemStyle: {
+                        normal: {
+                            areaColor: '#f8f9fa',
+                            borderColor: '#ddd',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            areaColor: '#ffeaa7',
+                            borderColor: '#fdcb6e',
+                            borderWidth: 2
+                        }
+                    },
+                    top: 10,
+                    bottom: isSmallScreen ? (isContinuousLegend ? 50 : 40) : 50,
+                    left: 10,
+                    right: 10
+                },
+                series: [
+                    {
+                        name: '人口密度',
+                        type: 'map',
+                        map: 'china',
+                        data: densityData,
+                        label: {
+                            show: labelShow,
+                            fontSize: labelFontSize,
+                            color: '#333',
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                areaColor: '#ffeaa7',
+                                borderColor: '#fdcb6e',
+                                borderWidth: 2
+                            }
+                        },
+                        top: 10,
+                        bottom: isSmallScreen ? (isContinuousLegend ? 50 : 40) : 50,
+                        left: 10,
+                        right: 10
+                    },
+                    {
+                        name: '人均GDP',
+                        type: 'scatter',
+                        coordinateSystem: 'geo',
+                        symbol: 'circle',
+                        symbolSize: function(data) {
+                            return pointShow ? getPointSize(data[2]) : 0;
+                        },
+                        data: pointData,
+                        itemStyle: {
+                            color: 'rgba(208, 0, 128, 0.8)',
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(208, 0, 128, 0.5)'
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                color: 'rgba(112, 0, 128, 0.9)',
+                                borderColor: '#fff',
+                                borderWidth: 3,
+                                shadowBlur: 15,
+                                shadowColor: 'rgba(112, 0, 128, 0.7)'
+                            }
+                        },
+                        zlevel: 10
+                    }
+                ]
+            };
+        };
+        
+        // 状态变量
+        var labelShow = true;
+        var pointShow = true;
+        var isContinuousLegend = false;
+        
+        // 初始渲染
+        function renderChart() {
+            myChart.setOption(createOption(), true);
+        }
+        
+        // 初始化
+        calculateStats();
+        renderChart();
+        
+        // 控件功能
+        document.getElementById('toggleLabel').addEventListener('click', function() {
+            labelShow = !labelShow;
+            this.innerHTML = labelShow ? '<i class="icon">🗺️</i> 隐藏省份名称' : '<i class="icon">🗺️</i> 显示省份名称';
+            renderChart();
+        });
+        
+        document.getElementById('togglePoint').addEventListener('click', function() {
+            pointShow = !pointShow;
+            this.innerHTML = pointShow ? '<i class="icon">🔘</i> 隐藏人均GDP圆点' : '<i class="icon">🔘</i> 显示人均GDP圆点';
+            renderChart();
+        });
+        
+        document.getElementById('switchLegend').addEventListener('click', function() {
+            isContinuousLegend = !isContinuousLegend;
+            this.innerHTML = isContinuousLegend ? '<i class="icon">📊</i> 切换：离散图例' : '<i class="icon">📊</i> 切换：滑动条图例';
+            renderChart();
+        });
+        
+        document.getElementById('resetMap').addEventListener('click', function() {
+            labelShow = true;
+            pointShow = true;
+            isContinuousLegend = false;
+            document.getElementById('toggleLabel').innerHTML = '<i class="icon">🗺️</i> 隐藏省份名称';
+            document.getElementById('togglePoint').innerHTML = '<i class="icon">🔘</i> 隐藏人均GDP圆点';
+            document.getElementById('switchLegend').innerHTML = '<i class="icon">📊</i> 切换：滑动条图例';
+            renderChart();
+        });
+        
+        // 窗口自适应
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                myChart.resize();
+                renderChart();
+            }, 200);
+        });
+        
+        // 监听容器大小变化
+        var mapContainer = document.getElementById('map');
+        if (typeof ResizeObserver !== 'undefined') {
+            var observer = new ResizeObserver(function() {
+                myChart.resize();
+                renderChart();
+            });
+            observer.observe(mapContainer);
+        }
+    </script>
+</body>
+</html>
