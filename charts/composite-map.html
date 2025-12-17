@@ -41,7 +41,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 900px; /* 限制容器最大宽度 */
+            max-width: 900px; 
         }
         
         .header {
@@ -156,7 +156,6 @@
         #map {
             flex: 1;
             min-height: 500px;
-            min-width: 850px;
             width: 100%;
         }
         
@@ -260,7 +259,6 @@
             }
         }
         
-        /* 新增：大屏幕优化 */
         @media (min-width: 1200px) {
             .container {
                 max-width: 1100px;
@@ -406,7 +404,7 @@
             density: item.value
         }));
         
-        // 图例配置
+        // 离散图例配置 - 固定位置和方向
         var discreteLegend = {
             type: 'piecewise',
             seriesIndex: 0,
@@ -418,7 +416,7 @@
                 { min: 601, max: 21000, label: '601+人/平方公里', color: '#FF3333' }
             ],
             left: 20,
-            bottom: 20,
+            bottom: 50,
             textStyle: { fontSize: 12, color: '#333' },
             orient: 'vertical',
             itemWidth: 18,
@@ -431,68 +429,60 @@
             borderRadius: 8
         };
         
-        // 修改连续图例：使用非线性映射，让低密度区域显示更明显
+        // 连续图例配置 - 固定位置和方向
         var continuousLegend = {
-    type: 'continuous',
-    seriesIndex: 0,
-    min: 0,
-    max: 800, // 关键修改：从21000改为800，聚焦主流数据范围（避开澳门极值）
-    range: [0, 800], // 初始范围聚焦在0-800区间，让大部分省份有颜色区分
-    left: 20,
-    bottom: 20,
-    text: ['高人口密度', '低人口密度'],
-    textStyle: { fontSize: 12, color: '#333' },
-    orient: 'vertical',
-    // 关键修改：改用continuous支持的线性渐变颜色数组格式
-    inRange: {
-        color: ['#0099FF', '#33CC33', '#FFFF00', '#FF9900', '#FF3333']
-    },
-    itemWidth: 20,
-    itemHeight: 180,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderColor: '#ddd',
-    borderWidth: 1,
-    padding: [10, 10],
-    borderRadius: 8,
-    calculable: true,
-    // 保留原有格式化逻辑
-    formatter: function(value) {
-        if (value > 3000) {
-            return '极高密度区（港澳）';
-        } else if (value >= 600) {
-            return '高密度区 (' + Math.round(value) + '人/平方公里)';
-        } else {
-            return Math.round(value) + '人/平方公里';
-        }
-    }
-};
+            type: 'continuous',
+            seriesIndex: 0,
+            min: 0,
+            max: 800,
+            range: [0, 800],
+            left: 20,
+            bottom: 50,
+            text: ['高人口密度', '低人口密度'],
+            textStyle: { fontSize: 12, color: '#333' },
+            orient: 'vertical',
+            inRange: {
+                color: ['#0099FF', '#33CC33', '#FFFF00', '#FF9900', '#FF3333']
+            },
+            itemWidth: 20,
+            itemHeight: 180,
+            backgroundColor: 'rgba(255,255,255,0.8)',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            padding: [10, 10],
+            borderRadius: 8,
+            calculable: true,
+            formatter: function(value) {
+                if (value > 3000) {
+                    return '极高密度区（港澳）';
+                } else if (value >= 600) {
+                    return '高密度区 (' + Math.round(value) + '人/平方公里)';
+                } else {
+                    return Math.round(value) + '人/平方公里';
+                }
+            }
+        };
         
         // 创建图表配置
         var createOption = function() {
             var containerWidth = document.getElementById('map').offsetWidth;
             var containerHeight = document.getElementById('map').offsetHeight;
             
-            // 根据容器宽度调整
-            var isSmallScreen = containerWidth < 768; // 调整为768px作为小屏幕阈值
-            var labelFontSize = Math.max(8, Math.min(14, containerWidth / 60)); // 调整字体大小计算
+            // 根据容器宽度调整字体大小
+            var labelFontSize = Math.max(8, Math.min(14, containerWidth / 60));
             
-            // 调整图例位置
+            // 固定图例配置，不随屏幕大小改变方向和位置
             var legendConfig = isContinuousLegend ? Object.assign({}, continuousLegend) : Object.assign({}, discreteLegend);
-            if (isSmallScreen) {
-                legendConfig.orient = 'horizontal';
-                legendConfig.left = 'center';
-                legendConfig.bottom = 10;
-                legendConfig.top = undefined;
-                
+            
+            // 在小屏幕上适当减小图例高度
+            if (containerWidth < 768) {
                 if (isContinuousLegend) {
-                    legendConfig.itemHeight = 15;
-                    legendConfig.itemWidth = Math.min(300, containerWidth * 0.8);
-                }
-            } else {
-                // 大屏幕时固定图例大小和位置
-                if (isContinuousLegend) {
-                    legendConfig.itemHeight = 180;
-                    legendConfig.itemWidth = 20;
+                    legendConfig.itemHeight = 120;
+                    legendConfig.textStyle.fontSize = 10;
+                } else {
+                    legendConfig.textStyle.fontSize = 10;
+                    legendConfig.itemHeight = 10;
+                    legendConfig.itemGap = 4;
                 }
             }
             
@@ -548,8 +538,9 @@
                             borderWidth: 2
                         }
                     },
+                    // 固定地图位置，为左下角图例留出空间
                     top: 10,
-                    bottom: isSmallScreen ? (isContinuousLegend ? 50 : 40) : 50,
+                    bottom: 80, // 增加底部空间，避免地图被图例遮挡
                     left: 10,
                     right: 10
                 },
@@ -576,8 +567,9 @@
                                 borderWidth: 2
                             }
                         },
+                        // 与geo保持一致
                         top: 10,
-                        bottom: isSmallScreen ? (isContinuousLegend ? 50 : 40) : 50,
+                        bottom: 80,
                         left: 10,
                         right: 10
                     },
