@@ -1,24 +1,24 @@
 // 主JavaScript文件
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 导航切换功能
     const navButtons = document.querySelectorAll('.nav-btn');
     const contentSections = document.querySelectorAll('.content-section');
-    
+
     navButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
-            
+
             // 更新活动按钮
             navButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            
+
             // 显示目标内容区
             contentSections.forEach(section => {
                 section.classList.remove('active');
             });
-            
+
             document.getElementById(targetId).classList.add('active');
-            
+
             if (targetId === 'composite-map') {
                 setupIframeAutoResize('composite-map-frame');
             } else if (targetId === 'region-chart') {
@@ -28,33 +28,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // 查看完整图表按钮
     const viewButtons = document.querySelectorAll('.view-full-btn');
     viewButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
-            
+
             // 切换导航
             navButtons.forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.nav-btn[data-target="${targetId}"]`).classList.add('active');
-            
+
             // 显示目标内容区
             contentSections.forEach(section => {
                 section.classList.remove('active');
             });
-            
+
             document.getElementById(targetId).classList.add('active');
         });
     });
-    
+
     // 全屏功能
     const fullscreenBtn = document.getElementById('fullscreen-btn');
-    fullscreenBtn.addEventListener('click', function(e) {
+    fullscreenBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        
+
         const elem = document.documentElement;
-        
+
         if (!document.fullscreenElement) {
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -75,57 +75,57 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-expand"></i> 全屏';
         }
     });
-    
+
     // 重置视图功能
     const resetViewBtn = document.getElementById('reset-view-btn');
-    resetViewBtn.addEventListener('click', function(e) {
+    resetViewBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        
+
         // 重置到仪表盘视图
         navButtons.forEach(btn => btn.classList.remove('active'));
         document.querySelector('.nav-btn[data-target="dashboard"]').classList.add('active');
-        
+
         contentSections.forEach(section => {
             section.classList.remove('active');
         });
-        
+
         document.getElementById('dashboard').classList.add('active');
     });
-    
+
     // 调整iframe大小函数
     function resizeIframe(iframeId) {
         const iframe = document.getElementById(iframeId);
         if (iframe) {
-            const contentHeight = iframe.contentWindow.document.body.scrollHeight || 
-            iframe.contentWindow.document.documentElement.scrollHeight;
+            const contentHeight = iframe.contentWindow.document.body.scrollHeight ||
+                iframe.contentWindow.document.documentElement.scrollHeight;
             iframe.style.height = (iframe.contentWindow.document.body.scrollHeight + 50) + 'px';
-            iframe.style.maxHeight = "90vh"; 
+            iframe.style.maxHeight = "90vh";
         }
     }
     function setupIframeAutoResize(iframeId) {
         const iframe = document.getElementById(iframeId);
         if (!iframe) return;
-        
+
         // 1. 移除旧的load事件（避免重复触发）
         iframe.onload = null;
-        
+
         // 2. 新的load事件：内容加载完成后调整高度（ECharts渲染完成）
-        iframe.onload = function() {
+        iframe.onload = function () {
             // 首次调整（加载完成）
             resizeIframe(iframeId);
             // 二次确认（兼容ECharts渲染延迟，300ms足够图表渲染完成）
             setTimeout(() => resizeIframe(iframeId), 300);
         };
-        
+
         // 3. 立即触发一次（处理iframe已缓存/提前加载的情况）
         resizeIframe(iframeId);
     }
-    
+
     // 为仪表盘创建预览图表
     createDashboardCharts();
-    
+
     // 监听窗口大小变化
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         // 重新调整活动iframe的大小
         const activeSection = document.querySelector('.content-section.active');
         if (activeSection.id === 'composite-map') {
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function createDashboardCharts() {
     // 如果没有ECharts，则不执行
     if (typeof echarts === 'undefined') return;
-    
+
     // 创建地图预览
     const mapPreview = echarts.init(document.getElementById('dashboard-map'));
     const mapOption = {
@@ -212,9 +212,9 @@ function createDashboardCharts() {
                 { name: '西藏', value: 3, gdp: 65553, center: [91.11, 29.97] },
                 { name: '陕西', value: 191.9, gdp: 85491, center: [108.95, 34.27] },
                 { name: '甘肃', value: 54.3, gdp: 48120, center: [103.73, 36.03] },
-                { name: '青海', value: 0.8, gdp: 63959, center: [101.74, 36.56] },
-                { name: '宁夏', value: 11, gdp: 72908, center: [106.27, 38.47] },
-                { name: '新疆', value: 1.6, gdp: 73618, center: [87.68, 43.77] },
+                { name: '青海', value: 8.2, gdp: 63959, center: [101.74, 36.56] },
+                { name: '宁夏', value: 109.8, gdp: 72908, center: [106.27, 38.47] },
+                { name: '新疆', value: 15.6, gdp: 73618, center: [87.68, 43.77] },
                 { name: '香港', value: 6760, gdp: 355255, center: [114.17, 22.28] },
                 { name: '澳门', value: 20576, gdp: 451183, center: [113.55, 22.19] },
                 { name: '台湾', value: 647, gdp: 231285, center: [121.5, 25.03] }
@@ -231,7 +231,7 @@ function createDashboardCharts() {
         }]
     };
     mapPreview.setOption(mapOption);
-    
+
     // 创建饼图预览
     const piePreview = echarts.init(document.getElementById('dashboard-pie'));
     const pieOption = {
@@ -257,12 +257,12 @@ function createDashboardCharts() {
             radius: ['40%', '70%'],
             center: ['50%', '55%'],
             data: [
-                { name: '华北', value: 382352/3 },
-                { name: '华东', value: 824520/7 },
-                { name: '华南', value: 233276/3 },
-                { name: '华中', value: 231980/3 },
-                { name: '西部', value: 694322/10 },
-                { name: '东北', value: 181951/3 }
+                { name: '华北', value: 186426 },
+                { name: '华东', value: 117788 },
+                { name: '华南', value: 77758 },
+                { name: '华中', value: 77326 },
+                { name: '西部', value: 69432 },
+                { name: '东北', value: 60650 }
             ],
             itemStyle: {
                 borderRadius: 6,
@@ -281,7 +281,7 @@ function createDashboardCharts() {
         }]
     };
     piePreview.setOption(pieOption);
-    
+
     // 创建条形图预览
     const barPreview = echarts.init(document.getElementById('dashboard-bar'));
     const barOption = {
@@ -329,7 +329,7 @@ function createDashboardCharts() {
             type: 'bar',
             data: [20576, 6760, 3557, 1333, 1146],
             itemStyle: {
-                color: function(params) {
+                color: function (params) {
                     var colorList = ['#e0f7fa', '#b2ebf2', '#80deea', '#4dd0e1', '#26c6da'];
                     return colorList[params.dataIndex];
                 },
@@ -343,9 +343,9 @@ function createDashboardCharts() {
         }]
     };
     barPreview.setOption(barOption);
-    
+
     // 窗口大小变化时调整预览图表
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         mapPreview.resize();
         piePreview.resize();
         barPreview.resize();

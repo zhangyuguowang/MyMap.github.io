@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>中国各省份经济与人口分布专题地图</title>
-    
+
     <!-- ECharts核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <!-- 中国地图数据 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
-    
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -27,7 +28,7 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         /* 限制最大宽度，防止过度拉伸 */
         .container-wrapper {
             width: 100%;
@@ -35,15 +36,15 @@
             display: flex;
             justify-content: center;
         }
-        
+
         .container {
             flex: 1;
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 900px; 
+            max-width: 900px;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -53,14 +54,14 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        
+
         .header h1 {
             color: #2c3e50;
             font-size: 24px;
             margin-bottom: 10px;
             font-weight: 700;
         }
-        
+
         .header .subtitle {
             color: #7f8c8d;
             font-size: 16px;
@@ -70,19 +71,19 @@
             gap: 20px;
             flex-wrap: wrap;
         }
-        
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
+
         .color-box {
             width: 20px;
             height: 20px;
             border-radius: 4px;
         }
-        
+
         .color-dot {
             width: 20px;
             height: 20px;
@@ -91,7 +92,7 @@
             border: 3px solid white;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         .controls {
             display: flex;
             gap: 10px;
@@ -99,7 +100,7 @@
             justify-content: center;
             margin: 15px 0;
         }
-        
+
         .control-btn {
             padding: 8px 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -114,34 +115,34 @@
             gap: 5px;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
+
         .control-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         .control-btn:active {
             transform: translateY(0);
         }
-        
+
         .control-btn.secondary {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
         }
-        
+
         .control-btn.secondary:hover {
             box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
         }
-        
+
         .control-btn.tertiary {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
         }
-        
+
         .control-btn.tertiary:hover {
             box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
         }
-        
+
         .map-container {
             flex: 1;
             background: rgba(255, 255, 255, 0.95);
@@ -152,13 +153,13 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         #map {
             flex: 1;
             min-height: 500px;
             width: 100%;
         }
-        
+
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -169,25 +170,25 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .stat {
             text-align: center;
             flex: 1;
             min-width: 150px;
         }
-        
+
         .stat-value {
             font-size: 24px;
             font-weight: 700;
             color: #2c3e50;
         }
-        
+
         .stat-label {
             font-size: 14px;
             color: #7f8c8d;
             margin-top: 5px;
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -196,80 +197,81 @@
             font-size: 14px;
             opacity: 0.9;
         }
-        
+
         .footer a {
             color: white;
             text-decoration: none;
             border-bottom: 1px dotted white;
         }
-        
+
         .footer a:hover {
             border-bottom: 1px solid white;
         }
-        
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-            
+
             .header h1 {
                 font-size: 20px;
             }
-            
+
             .header .subtitle {
                 font-size: 14px;
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .controls {
                 gap: 8px;
             }
-            
+
             .control-btn {
                 padding: 6px 12px;
                 font-size: 12px;
             }
-            
+
             .map-container {
                 padding: 15px;
             }
-            
+
             .stats-bar {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .stat {
                 min-width: 100%;
             }
         }
-        
+
         @media (max-width: 480px) {
             .header {
                 padding: 15px;
             }
-            
+
             .header h1 {
                 font-size: 18px;
             }
-            
+
             .map-container {
                 padding: 10px;
             }
         }
-        
+
         @media (min-width: 1200px) {
             .container {
                 max-width: 1100px;
             }
-            
+
             .map-container {
                 min-height: 600px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-wrapper">
         <div class="container">
@@ -281,11 +283,13 @@
                         <span>紫色圆点：人均GDP（圆点越大表示人均GDP越高）</span>
                     </div>
                     <div class="legend-item">
-                        <div class="color-box" style="background: linear-gradient(90deg, #0099FF, #33CC33, #FFFF00, #FF9900, #FF3333)"></div>
+                        <div class="color-box"
+                            style="background: linear-gradient(90deg, #0099FF, #33CC33, #FFFF00, #FF9900, #FF3333)">
+                        </div>
                         <span>面状底色：人口密度（颜色越红表示人口密度越高）</span>
                     </div>
                 </div>
-                
+
                 <div class="controls">
                     <button class="control-btn" id="toggleLabel">
                         <i class="icon">🗺️</i> 隐藏省份名称
@@ -301,11 +305,11 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="map-container">
                 <div id="map"></div>
             </div>
-            
+
             <div class="stats-bar">
                 <div class="stat">
                     <div class="stat-value" id="maxDensity">20,718</div>
@@ -324,7 +328,7 @@
                     <div class="stat-label">省级行政区总数</div>
                 </div>
             </div>
-            
+
             <div class="footer">
                 <p>数据来源：2023年国家统计局公开数据、各省份统计公报 | 制图：阮文博 | 使用ECharts绘制</p>
                 <p>提示：点击地图上的省份查看详细数据，拖动图例可调整显示范围</p>
@@ -335,56 +339,56 @@
     <script>
         // 初始化图表
         var myChart = echarts.init(document.getElementById('map'));
-        
+
         // 基础数据（包含经纬度信息）
         var densityData = [
-    { name: '北京', value: 1332.8, gdp: 200205, center: [116.46, 39.92] },
-    { name: '天津', value: 1146.1, gdp: 122707, center: [117.2, 39.13] },
-    { name: '河北', value: 391.6, gdp: 59440, center: [114.48, 38.03] },
-    { name: '山西', value: 221.2, gdp: 74144, center: [112.53, 37.87] },
-    { name: '内蒙古', value: 20.3, gdp: 102784, center: [111.65, 40.82] },
-    { name: '辽宁', value: 282.6, gdp: 72237, center: [123.43, 41.8] },
-    { name: '吉林', value: 124.8, gdp: 57840, center: [125.35, 43.88] },
-    { name: '黑龙江', value: 64.7, gdp: 51874, center: [126.63, 45.75] },
-    { name: '上海', value: 3553.6, gdp: 189824, center: [121.48, 31.22] },
-    { name: '江苏', value: 831, gdp: 150390, center: [118.78, 32.04] },
-    { name: '浙江', value: 651, gdp: 124571, center: [120.19, 30.26] },
-    { name: '安徽', value: 437.2, gdp: 76868, center: [117.27, 31.86] },
-    { name: '福建', value: 337.3, gdp: 129943, center: [119.3, 26.08] },
-    { name: '江西', value: 270.5, gdp: 71318, center: [115.85, 28.68] },
-    { name: '山东', value: 644.4, gdp: 90951, center: [117.0, 36.65] },
-    { name: '河南', value: 587.7, gdp: 60247, center: [113.65, 34.76] },
-    { name: '湖北', value: 314, gdp: 95587, center: [114.31, 30.52] },
-    { name: '湖南', value: 310.1, gdp: 76146, center: [113.0, 28.21] },
-    { name: '广东', value: 706.7, gdp: 106779, center: [113.23, 23.16] },
-    { name: '广西', value: 212.4, gdp: 54113, center: [108.33, 22.84] },
-    { name: '海南', value: 294.7, gdp: 72384, center: [110.35, 20.02] },
-    { name: '重庆', value: 387.3, gdp: 94459, center: [106.55, 29.57] },
-    { name: '四川', value: 172.2, gdp: 71861, center: [104.06, 30.67] },
-    { name: '贵州', value: 219.6, gdp: 54109, center: [106.71, 26.57] },
-    { name: '云南', value: 119.8, gdp: 64244, center: [102.73, 25.04] },
-    { name: '西藏', value: 3, gdp: 65553, center: [91.11, 29.97] },
-    { name: '陕西', value: 191.9, gdp: 85491, center: [108.95, 34.27] },
-    { name: '甘肃', value: 54.3, gdp: 48120, center: [103.73, 36.03] },
-    { name: '青海', value: 0.8, gdp: 63959, center: [101.74, 36.56] },
-    { name: '宁夏', value: 11, gdp: 72908, center: [106.27, 38.47] },
-    { name: '新疆', value: 1.6, gdp: 73618, center: [87.68, 43.77] },
-    { name: '香港', value: 6760, gdp: 355255, center: [114.17, 22.28] },
-    { name: '澳门', value: 20576, gdp: 451183, center: [113.55, 22.19] },
-    { name: '台湾', value: 647, gdp: 231285, center: [121.5, 25.03] }
-];
-        
+            { name: '北京', value: 1332.8, gdp: 200205, center: [116.46, 39.92] },
+            { name: '天津', value: 1146.1, gdp: 122707, center: [117.2, 39.13] },
+            { name: '河北', value: 391.6, gdp: 59440, center: [114.48, 38.03] },
+            { name: '山西', value: 221.2, gdp: 74144, center: [112.53, 37.87] },
+            { name: '内蒙古', value: 20.3, gdp: 102784, center: [111.65, 40.82] },
+            { name: '辽宁', value: 282.6, gdp: 72237, center: [123.43, 41.8] },
+            { name: '吉林', value: 124.8, gdp: 57840, center: [125.35, 43.88] },
+            { name: '黑龙江', value: 64.7, gdp: 51874, center: [126.63, 45.75] },
+            { name: '上海', value: 3553.6, gdp: 189824, center: [121.48, 31.22] },
+            { name: '江苏', value: 831, gdp: 150390, center: [118.78, 32.04] },
+            { name: '浙江', value: 651, gdp: 124571, center: [120.19, 30.26] },
+            { name: '安徽', value: 437.2, gdp: 76868, center: [117.27, 31.86] },
+            { name: '福建', value: 337.3, gdp: 129943, center: [119.3, 26.08] },
+            { name: '江西', value: 270.5, gdp: 71318, center: [115.85, 28.68] },
+            { name: '山东', value: 644.4, gdp: 90951, center: [117.0, 36.65] },
+            { name: '河南', value: 587.7, gdp: 60247, center: [113.65, 34.76] },
+            { name: '湖北', value: 314, gdp: 95587, center: [114.31, 30.52] },
+            { name: '湖南', value: 310.1, gdp: 76146, center: [113.0, 28.21] },
+            { name: '广东', value: 706.7, gdp: 106779, center: [113.23, 23.16] },
+            { name: '广西', value: 212.4, gdp: 54113, center: [108.33, 22.84] },
+            { name: '海南', value: 294.7, gdp: 72384, center: [110.35, 20.02] },
+            { name: '重庆', value: 387.3, gdp: 94459, center: [106.55, 29.57] },
+            { name: '四川', value: 172.2, gdp: 71861, center: [104.06, 30.67] },
+            { name: '贵州', value: 219.6, gdp: 54109, center: [106.71, 26.57] },
+            { name: '云南', value: 119.8, gdp: 64244, center: [102.73, 25.04] },
+            { name: '西藏', value: 3, gdp: 65553, center: [91.11, 29.97] },
+            { name: '陕西', value: 191.9, gdp: 85491, center: [108.95, 34.27] },
+            { name: '甘肃', value: 54.3, gdp: 48120, center: [103.73, 36.03] },
+            { name: '青海', value: 8.2, gdp: 63959, center: [101.74, 36.56] },
+            { name: '宁夏', value: 109.8, gdp: 72908, center: [106.27, 38.47] },
+            { name: '新疆', value: 15.6, gdp: 73618, center: [87.68, 43.77] },
+            { name: '香港', value: 6760, gdp: 355255, center: [114.17, 22.28] },
+            { name: '澳门', value: 20576, gdp: 451183, center: [113.55, 22.19] },
+            { name: '台湾', value: 647, gdp: 231285, center: [121.5, 25.03] }
+        ];
+
         // 计算统计数据
         function calculateStats() {
             let maxDensity = Math.max(...densityData.map(d => d.value));
             let maxGDP = Math.max(...densityData.map(d => d.gdp));
             let avgDensity = densityData.reduce((sum, d) => sum + d.value, 0) / densityData.length;
-            
+
             document.getElementById('maxDensity').textContent = maxDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
             document.getElementById('maxGDP').textContent = maxGDP.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
             document.getElementById('avgDensity').textContent = avgDensity.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
         }
-        
+
         // 计算圆点大小
         function getPointSize(gdpValue) {
             const containerWidth = document.getElementById('map').offsetWidth;
@@ -395,7 +399,7 @@
             const normalized = (gdpValue - minGdp) / (maxGdp - minGdp);
             return normalized * baseSize + 5;
         }
-        
+
         // 准备散点图数据
         var pointData = densityData.map(item => ({
             name: item.name,
@@ -403,7 +407,7 @@
             gdp: item.gdp,
             density: item.value
         }));
-        
+
         // 离散图例配置 - 固定位置和方向
         var discreteLegend = {
             type: 'piecewise',
@@ -428,7 +432,7 @@
             padding: [10, 10],
             borderRadius: 8
         };
-        
+
         // 连续图例配置 - 固定位置和方向
         var continuousLegend = {
             type: 'continuous',
@@ -452,7 +456,7 @@
             padding: [10, 10],
             borderRadius: 8,
             calculable: true,
-            formatter: function(value) {
+            formatter: function (value) {
                 if (value > 3000) {
                     return '极高密度区（港澳）';
                 } else if (value >= 600) {
@@ -462,18 +466,18 @@
                 }
             }
         };
-        
+
         // 创建图表配置
-        var createOption = function() {
+        var createOption = function () {
             var containerWidth = document.getElementById('map').offsetWidth;
             var containerHeight = document.getElementById('map').offsetHeight;
-            
+
             // 根据容器宽度调整字体大小
             var labelFontSize = Math.max(8, Math.min(14, containerWidth / 60));
-            
+
             // 固定图例配置，不随屏幕大小改变方向和位置
             var legendConfig = isContinuousLegend ? Object.assign({}, continuousLegend) : Object.assign({}, discreteLegend);
-            
+
             // 在小屏幕上适当减小图例高度
             if (containerWidth < 768) {
                 if (isContinuousLegend) {
@@ -485,7 +489,7 @@
                     legendConfig.itemGap = 4;
                 }
             }
-            
+
             return {
                 title: {
                     text: '',
@@ -500,7 +504,7 @@
                         color: '#333',
                         fontSize: 14
                     },
-                    formatter: function(params) {
+                    formatter: function (params) {
                         if (params.seriesType === 'map') {
                             var dataItem = densityData.find(item => item.name === params.name);
                             if (dataItem) {
@@ -578,7 +582,7 @@
                         type: 'scatter',
                         coordinateSystem: 'geo',
                         symbol: 'circle',
-                        symbolSize: function(data) {
+                        symbolSize: function (data) {
                             return pointShow ? getPointSize(data[2]) : 0;
                         },
                         data: pointData,
@@ -603,41 +607,41 @@
                 ]
             };
         };
-        
+
         // 状态变量
         var labelShow = true;
         var pointShow = true;
         var isContinuousLegend = false;
-        
+
         // 初始渲染
         function renderChart() {
             myChart.setOption(createOption(), true);
         }
-        
+
         // 初始化
         calculateStats();
         renderChart();
-        
+
         // 控件功能
-        document.getElementById('toggleLabel').addEventListener('click', function() {
+        document.getElementById('toggleLabel').addEventListener('click', function () {
             labelShow = !labelShow;
             this.innerHTML = labelShow ? '<i class="icon">🗺️</i> 隐藏省份名称' : '<i class="icon">🗺️</i> 显示省份名称';
             renderChart();
         });
-        
-        document.getElementById('togglePoint').addEventListener('click', function() {
+
+        document.getElementById('togglePoint').addEventListener('click', function () {
             pointShow = !pointShow;
             this.innerHTML = pointShow ? '<i class="icon">🔘</i> 隐藏人均GDP圆点' : '<i class="icon">🔘</i> 显示人均GDP圆点';
             renderChart();
         });
-        
-        document.getElementById('switchLegend').addEventListener('click', function() {
+
+        document.getElementById('switchLegend').addEventListener('click', function () {
             isContinuousLegend = !isContinuousLegend;
             this.innerHTML = isContinuousLegend ? '<i class="icon">📊</i> 切换：离散图例' : '<i class="icon">📊</i> 切换：滑动条图例';
             renderChart();
         });
-        
-        document.getElementById('resetMap').addEventListener('click', function() {
+
+        document.getElementById('resetMap').addEventListener('click', function () {
             labelShow = true;
             pointShow = true;
             isContinuousLegend = false;
@@ -646,21 +650,21 @@
             document.getElementById('switchLegend').innerHTML = '<i class="icon">📊</i> 切换：滑动条图例';
             renderChart();
         });
-        
+
         // 窗口自适应
         var resizeTimer;
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
+            resizeTimer = setTimeout(function () {
                 myChart.resize();
                 renderChart();
             }, 200);
         });
-        
+
         // 监听容器大小变化
         var mapContainer = document.getElementById('map');
         if (typeof ResizeObserver !== 'undefined') {
-            var observer = new ResizeObserver(function() {
+            var observer = new ResizeObserver(function () {
                 myChart.resize();
                 renderChart();
             });
@@ -668,4 +672,5 @@
         }
     </script>
 </body>
+
 </html>

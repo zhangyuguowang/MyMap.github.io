@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
 </head>
+
 <body>
     <div class="container">
         <!-- 标题栏 -->
@@ -45,7 +47,7 @@
                             <button class="view-full-btn" data-target="composite-map">查看完整地图</button>
                         </div>
                     </div>
-                    
+
                     <div class="dashboard-card">
                         <h2><i class="fas fa-chart-pie"></i> 区域人均GDP分布</h2>
                         <div class="card-content">
@@ -54,7 +56,7 @@
                             <button class="view-full-btn" data-target="region-chart">查看详细图表</button>
                         </div>
                     </div>
-                    
+
                     <div class="dashboard-card">
                         <h2><i class="fas fa-chart-bar"></i> 区域人口密度排行</h2>
                         <div class="card-content">
@@ -63,7 +65,7 @@
                             <button class="view-full-btn" data-target="density-chart">查看详细图表</button>
                         </div>
                     </div>
-                    
+
                     <div class="dashboard-card">
                         <h2><i class="fas fa-database"></i> 数据概览</h2>
                         <div class="card-content">
@@ -135,7 +137,7 @@
                         <h3>项目背景</h3>
                         <p>本项目基于2023年中国各省份GDP、人口及面积数据，通过多种可视化方式展现中国各地区经济发展水平与人口分布特征。</p>
                     </div>
-                    
+
                     <div class="about-card">
                         <h3>数据来源</h3>
                         <ul>
@@ -143,7 +145,7 @@
                             <li>各省份统计公报</li>
                         </ul>
                     </div>
-                    
+
                     <div class="about-card">
                         <h3>可视化技术</h3>
                         <div class="tech-grid">
@@ -164,7 +166,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="about-card">
                         <h3>专题地图说明</h3>
                         <div class="map-legend">
@@ -172,18 +174,24 @@
                             <div class="legend-info">
                                 <h4>图例说明</h4>
                                 <ul>
-                                    <li><span class="color-box" style="background-color: #0099FF;"></span> 人口密度：0-100人/平方公里</li>
-                                    <li><span class="color-box" style="background-color: #33CC33;"></span> 人口密度：101-200人/平方公里</li>
-                                    <li><span class="color-box" style="background-color: #FFFF00;"></span> 人口密度：201-300人/平方公里</li>
-                                    <li><span class="color-box" style="background-color: #FF9900;"></span> 人口密度：301-600人/平方公里</li>
-                                    <li><span class="color-box" style="background-color: #FF3333;"></span> 人口密度：601+人/平方公里</li>
-                                    <li><span class="color-dot" style="background-color: #d00080;"></span> 人均GDP圆点（大小与数值成正比）</li>
+                                    <li><span class="color-box" style="background-color: #0099FF;"></span>
+                                        人口密度：0-100人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #33CC33;"></span>
+                                        人口密度：101-200人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FFFF00;"></span>
+                                        人口密度：201-300人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FF9900;"></span>
+                                        人口密度：301-600人/平方公里</li>
+                                    <li><span class="color-box" style="background-color: #FF3333;"></span>
+                                        人口密度：601+人/平方公里</li>
+                                    <li><span class="color-dot" style="background-color: #d00080;"></span>
+                                        人均GDP圆点（大小与数值成正比）</li>
                                 </ul>
                                 <p class="note">注：九段线表示中国南海疆界，是中华人民共和国的固有领土。</p>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="about-card">
                         <h3>作者信息</h3>
                         <p><strong>制图人：</strong>2023114357 阮文博</p>
@@ -197,7 +205,8 @@
         <footer class="footer">
             <p>© 2025 中国数据可视化项目 | 数据来源：国家统计局公开数据、各省份统计公报 | 可视化工具：ECharts</p>
             <div class="footer-links">
-                <a href="https://github.com/zhangyuguowang/MyMap.github.io" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://github.com/zhangyuguowang/MyMap.github.io" target="_blank"><i
+                        class="fab fa-github"></i> GitHub</a>
                 <a href="#" id="fullscreen-btn"><i class="fas fa-expand"></i> 全屏</a>
                 <a href="#" id="reset-view-btn"><i class="fas fa-redo"></i> 重置视图</a>
             </div>
@@ -206,4 +215,5 @@
 
     <script src="js/main.js"></script>
 </body>
+
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>六大区域人均GDP分布 - 复合饼图</title>
+    <title>各大区域人均GDP分布 - 复合饼图</title>
 
     <!-- ECharts核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
@@ -281,10 +281,10 @@
     <div class="container-wrapper">
         <div class="container">
             <div class="header">
-                <h1>2023年中国六大区域-省份人均GDP分布</h1>
+                <h1>2023年中国各大区域-省份人均GDP分布</h1>
                 <div class="subtitle">点击区域查看省份详情，点击任意位置返回区域视图</div>
                 <div class="instructions">
-                    <strong>使用说明：</strong> 饼图展示了六大经济区域的人均GDP分布。点击任一区域可查看该区域内各省份的详细数据，点击任意位置返回区域视图。
+                    <strong>使用说明：</strong> 饼图展示了各大经济区域的人均GDP分布。点击任一区域可查看该区域内各省份的详细数据，点击任意位置返回区域视图。
                 </div>
 
                 <div class="region-list" id="regionList">
@@ -343,22 +343,22 @@
 
         // 区域级数据（六大区域）
         var areaDataSix = [
-            { name: '华北', value: 559280 / 3 },
-            { name: '华东', value: 824520 / 7 },
-            { name: '华南', value: 233276 / 3 },
-            { name: '华中', value: 231980 / 3 },
-            { name: '西部', value: 694322 / 10 },
-            { name: '东北', value: 181951 / 3 }
+            { name: '华北', value: 186426 },
+            { name: '华东', value: 117788 },
+            { name: '华南', value: 77758 },
+            { name: '华中', value: 77326 },
+            { name: '西部', value: 69432 },
+            { name: '东北', value: 60650 }
         ];
         // 区域级数据（七大区域 - 包含港澳台）
         var areaDataSeven = [
-            { name: '港澳台', value: 1037723 / 3 }, // 港澳台平均值
-            { name: '华北', value: 559280 / 3 },
-            { name: '华东', value: 824520 / 7 },
-            { name: '华南', value: 233276 / 3 },
-            { name: '华中', value: 231980 / 3 },
-            { name: '西部', value: 694322 / 10 },
-            { name: '东北', value: 181951 / 3 }
+            { name: '港澳台', value: 345908 }, // 港澳台平均值
+            { name: '华北', value: 186426 },
+            { name: '华东', value: 117788 },
+            { name: '华南', value: 77758 },
+            { name: '华中', value: 77326 },
+            { name: '西部', value: 69432 },
+            { name: '东北', value: 60650 }
         ];
         // 省份级数据
         // 省份级数据
@@ -456,41 +456,41 @@
 
         // 计算统计数据
         function calculateStats() {
-    var currentProvinceData = getCurrentProvinceData();
-    
-    // 计算最高和最低人均GDP
-    let allProvinces = [];
-    Object.values(currentProvinceData).forEach(provinces => {
-        allProvinces = allProvinces.concat(provinces);
-    });
-    
-    let highest = Math.max(...allProvinces.map(p => p.value));
-    let lowest = Math.min(...allProvinces.map(p => p.value));
-    
-    // 计算区域平均值（正确计算）
-    var currentAreaData = getCurrentAreaData();
-    let avg = currentAreaData.reduce((sum, area) => sum + area.value, 0) / currentAreaData.length;
-    
-    // 更新省份总数
-    var totalProvinces = allProvinces.length;
-    
-    // 更新DOM
-    document.getElementById('highestGDP').textContent = highest.toLocaleString('zh-CN');
-    document.getElementById('lowestGDP').textContent = lowest.toLocaleString('zh-CN');
-    document.getElementById('avgGDP').textContent = Math.round(avg).toLocaleString('zh-CN');
-    
-    // 更新包含省份总数的显示（找到正确的元素）
-    var totalSpan = document.querySelector('.stats-info .stat-item:last-child .stat-value');
-    if (totalSpan) {
-        totalSpan.textContent = totalProvinces;
-    }
-    
-    // 更新数据说明
-    var noteText = includeHKMT ? 
-        '注：数据包含中国34个省级行政区（含港澳台）' : 
-        '注：数据包含中国大陆31个省级行政区（不含港澳台）';
-    document.getElementById('dataNote').textContent = noteText;
-}
+            var currentProvinceData = getCurrentProvinceData();
+
+            // 计算最高和最低人均GDP
+            let allProvinces = [];
+            Object.values(currentProvinceData).forEach(provinces => {
+                allProvinces = allProvinces.concat(provinces);
+            });
+
+            let highest = Math.max(...allProvinces.map(p => p.value));
+            let lowest = Math.min(...allProvinces.map(p => p.value));
+
+            // 计算区域平均值（正确计算）
+            var currentAreaData = getCurrentAreaData();
+            let avg = currentAreaData.reduce((sum, area) => sum + area.value, 0) / currentAreaData.length;
+
+            // 更新省份总数
+            var totalProvinces = allProvinces.length;
+
+            // 更新DOM
+            document.getElementById('highestGDP').textContent = highest.toLocaleString('zh-CN');
+            document.getElementById('lowestGDP').textContent = lowest.toLocaleString('zh-CN');
+            document.getElementById('avgGDP').textContent = Math.round(avg).toLocaleString('zh-CN');
+
+            // 更新包含省份总数的显示（找到正确的元素）
+            var totalSpan = document.querySelector('.stats-info .stat-item:last-child .stat-value');
+            if (totalSpan) {
+                totalSpan.textContent = totalProvinces;
+            }
+
+            // 更新数据说明
+            var noteText = includeHKMT ?
+                '注：数据包含中国34个省级行政区（含港澳台）' :
+                '注：数据包含中国大陆31个省级行政区（不含港澳台）';
+            document.getElementById('dataNote').textContent = noteText;
+        }
 
         // 动态计算图表配置
         function createOption(isProvinceView, currentArea) {
@@ -520,16 +520,12 @@
                 (isProvinceView ? ['35%', '75%'] : ['30%', '70%']);
 
             // 根据当前模式设置标题
-            var regionCount = includeHKMT ? '七大' : '六大';
-            var provinceCount = includeHKMT ? 34 : 31; // 包含港澳台共34个，不包含31个
+            var regionCount = includeHKMT ? '六大区域+港澳台特区' : '六大区域';
+            var provinceCount = includeHKMT ? 34 : 31;
 
             var titleText = isProvinceView ?
                 `${currentArea}省份人均GDP分布` :
-                `2023年中国${regionCount}区域人均GDP分布`;
-
-            var subtext = isProvinceView ?
-                '点击任意位置返回区域视图' :
-                '点击区域查看省份详情';
+                `2023年中国${regionCount}人均GDP分布`;
 
             // 获取当前显示的数据
             var displayData = isProvinceView ?
@@ -546,7 +542,6 @@
                         color: '#2c3e50'
                     },
                     top: 10,
-                    subtext: subtext,
                     subtextStyle: {
                         fontSize: Math.max(9, titleFontSize - 4),
                         color: '#7f8c8d'
