@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>六大区域人均GDP分布 - 复合饼图</title>
-    
+
     <!-- ECharts核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-    
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -25,7 +26,7 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         /* 容器包装，限制最大宽度 */
         .container-wrapper {
             width: 100%;
@@ -33,7 +34,7 @@
             display: flex;
             justify-content: center;
         }
-        
+
         .container {
             flex: 1;
             display: flex;
@@ -41,7 +42,7 @@
             width: 100%;
             max-width: 1200px;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -51,20 +52,20 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        
+
         .header h1 {
             color: #2c3e50;
             font-size: 24px;
             margin-bottom: 10px;
             font-weight: 700;
         }
-        
+
         .header .subtitle {
             color: #7f8c8d;
             font-size: 16px;
             margin-bottom: 15px;
         }
-        
+
         .instructions {
             background: #f8f9fa;
             border-radius: 8px;
@@ -74,7 +75,7 @@
             color: #5a6c7d;
             border-left: 4px solid #4facfe;
         }
-        
+
         .controls {
             display: flex;
             gap: 10px;
@@ -82,7 +83,7 @@
             justify-content: center;
             margin-top: 15px;
         }
-        
+
         .control-btn {
             padding: 8px 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -97,21 +98,21 @@
             gap: 5px;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
+
         .control-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         .control-btn.secondary {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
         }
-        
+
         .control-btn.secondary:hover {
             box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
         }
-        
+
         .chart-container {
             flex: 1;
             background: rgba(255, 255, 255, 0.95);
@@ -122,13 +123,13 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         #gdpPieChart {
             flex: 1;
             min-height: 500px;
             width: 100%;
         }
-        
+
         .stats-info {
             display: flex;
             justify-content: space-between;
@@ -139,25 +140,25 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .stat-item {
             text-align: center;
             flex: 1;
             min-width: 150px;
         }
-        
+
         .stat-value {
             font-size: 22px;
             font-weight: 700;
             color: #2c3e50;
         }
-        
+
         .stat-label {
             font-size: 14px;
             color: #7f8c8d;
             margin-top: 5px;
         }
-        
+
         .region-list {
             display: flex;
             flex-wrap: wrap;
@@ -165,7 +166,7 @@
             margin-top: 15px;
             justify-content: center;
         }
-        
+
         .region-tag {
             padding: 6px 12px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -175,17 +176,17 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .region-tag:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
         }
-        
+
         .region-tag.active {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             box-shadow: 0 4px 10px rgba(240, 147, 251, 0.3);
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -194,87 +195,88 @@
             font-size: 14px;
             opacity: 0.9;
         }
-        
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-            
+
             .header h1 {
                 font-size: 20px;
             }
-            
+
             .header .subtitle {
                 font-size: 14px;
             }
-            
+
             .instructions {
                 font-size: 12px;
                 padding: 10px;
             }
-            
+
             .controls {
                 gap: 8px;
             }
-            
+
             .control-btn {
                 padding: 6px 12px;
                 font-size: 12px;
             }
-            
+
             .chart-container {
                 padding: 15px;
             }
-            
+
             .stats-info {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .stat-item {
                 min-width: 100%;
             }
-            
+
             .region-list {
                 gap: 6px;
             }
-            
+
             .region-tag {
                 padding: 4px 10px;
                 font-size: 11px;
             }
         }
-        
+
         @media (max-width: 480px) {
             .header {
                 padding: 15px;
             }
-            
+
             .header h1 {
                 font-size: 18px;
             }
-            
+
             .chart-container {
                 padding: 10px;
             }
-            
+
             #gdpPieChart {
                 min-height: 400px;
             }
         }
-        
+
         @media (min-width: 1200px) {
             .container {
                 max-width: 1100px;
             }
-            
+
             .chart-container {
                 min-height: 600px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-wrapper">
         <div class="container">
@@ -284,11 +286,11 @@
                 <div class="instructions">
                     <strong>使用说明：</strong> 饼图展示了六大经济区域的人均GDP分布。点击任一区域可查看该区域内各省份的详细数据，点击任意位置返回区域视图。
                 </div>
-                
+
                 <div class="region-list" id="regionList">
                     <!-- 区域标签将通过JavaScript动态生成 -->
                 </div>
-                
+
                 <div class="controls">
                     <button class="control-btn" id="toggleLabels">
                         <i class="icon">🏷️</i> 隐藏数据标签
@@ -296,16 +298,19 @@
                     <button class="control-btn secondary" id="toggleLegend">
                         <i class="icon">📖</i> 隐藏图例
                     </button>
+                    <button class="control-btn secondary" id="toggleHKMT">
+                        <i class="icon">🌟</i> 包含港澳台
+                    </button>
                     <button class="control-btn" id="resetView">
                         <i class="icon">🔄</i> 重置视图
                     </button>
                 </div>
             </div>
-            
+
             <div class="chart-container">
                 <div id="gdpPieChart"></div>
             </div>
-            
+
             <div class="stats-info">
                 <div class="stat-item">
                     <div class="stat-value" id="highestGDP">180,479</div>
@@ -324,10 +329,10 @@
                     <div class="stat-label">包含省份总数</div>
                 </div>
             </div>
-            
+
             <div class="footer">
                 <p>数据来源：2023年国家统计局公开数据、各省份统计公报 | 制图：阮文博 | 使用ECharts绘制</p>
-                <p>注：数据包含中国大陆31个省级行政区（不含港澳台）</p>
+                <p id="dataNote">注：数据包含中国大陆31个省级行政区（不含港澳台）</p>
             </div>
         </div>
     </div>
@@ -335,62 +340,88 @@
     <script>
         // 初始化图表
         var myChart = echarts.init(document.getElementById('gdpPieChart'));
-        
+
         // 区域级数据（六大区域）
-        var areaData = [
-            { name: '华东', value: 118000 },
-            { name: '华南', value: 95000 },
-            { name: '华北', value: 105000 },
-            { name: '东北', value: 63000 },
-            { name: '华中', value: 72000 },
-            { name: '西部', value: 68000 }
+        var areaDataSix = [
+            { name: '华北', value: 559280 / 3 },
+            { name: '华东', value: 824520 / 7 },
+            { name: '华南', value: 233276 / 3 },
+            { name: '华中', value: 231980 / 3 },
+            { name: '西部', value: 694322 / 10 },
+            { name: '东北', value: 181951 / 3 }
         ];
-        
+        // 区域级数据（七大区域 - 包含港澳台）
+        var areaDataSeven = [
+            { name: '港澳台', value: 1037723 / 3 }, // 港澳台平均值
+            { name: '华北', value: 559280 / 3 },
+            { name: '华东', value: 824520 / 7 },
+            { name: '华南', value: 233276 / 3 },
+            { name: '华中', value: 231980 / 3 },
+            { name: '西部', value: 694322 / 10 },
+            { name: '东北', value: 181951 / 3 }
+        ];
         // 省份级数据
-        var provinceData = {
+        // 省份级数据
+        var provinceDataSix = {
             '华东': [
                 { name: '上海', value: 180479 },
-                { name: '江苏', value: 144390 },
-                { name: '浙江', value: 128820 },
-                { name: '安徽', value: 73603 },
-                { name: '福建', value: 126829 },
-                { name: '江西', value: 65567 },
-                { name: '山东', value: 86056 }
+                { name: '江苏', value: 150390 },
+                { name: '浙江', value: 124571 },
+                { name: '福建', value: 129943 },
+                { name: '山东', value: 90951 },
+                { name: '安徽', value: 76868 },
+                { name: '江西', value: 71318 }
             ],
             '华南': [
-                { name: '广东', value: 101905 },
-                { name: '广西', value: 52271 },
-                { name: '海南', value: 66717 }
+                { name: '广东', value: 106779 },
+                { name: '海南', value: 72384 },
+                { name: '广西', value: 54113 }
             ],
             '华北': [
-                { name: '北京', value: 190088 },
-                { name: '天津', value: 119414 },
-                { name: '河北', value: 60169 }
+                { name: '北京', value: 200205 },
+                { name: '天津', value: 122707 },
+                { name: '内蒙古', value: 102784 },
+                { name: '山西', value: 74144 },
+                { name: '河北', value: 59440 }
             ],
             '东北': [
-                { name: '辽宁', value: 79674 },
-                { name: '吉林', value: 56199 },
-                { name: '黑龙江', value: 52875 }
+                { name: '辽宁', value: 72237 },
+                { name: '吉林', value: 57840 },
+                { name: '黑龙江', value: 51874 }
             ],
             '华中': [
-                { name: '河南', value: 62106 },
-                { name: '湖北', value: 89147 },
-                { name: '湖南', value: 73598 }
+                { name: '湖北', value: 95587 },
+                { name: '湖南', value: 76146 },
+                { name: '河南', value: 60247 }
             ],
             '西部': [
-                { name: '重庆', value: 90663 },
-                { name: '四川', value: 67777 },
-                { name: '贵州', value: 52348 },
-                { name: '云南', value: 57143 },
-                { name: '陕西', value: 82864 },
-                { name: '甘肃', value: 48120 },
-                { name: '青海', value: 63958 },
-                { name: '宁夏', value: 72908 },
+                { name: '重庆', value: 94459 },
+                { name: '陕西', value: 85491 },
                 { name: '新疆', value: 73618 },
-                { name: '西藏', value: 65553 }
+                { name: '宁夏', value: 72908 },
+                { name: '四川', value: 71861 },
+                { name: '西藏', value: 65553 },
+                { name: '云南', value: 64244 },
+                { name: '青海', value: 63959 },
+                { name: '贵州', value: 54109 },
+                { name: '甘肃', value: 48120 }
             ]
         };
-        
+        var provinceDataSeven = {
+            // 复制原有的六大区域省份数据
+            '华东': provinceDataSix['华东'],
+            '华南': provinceDataSix['华南'],
+            '华北': provinceDataSix['华北'],
+            '东北': provinceDataSix['东北'],
+            '华中': provinceDataSix['华中'],
+            '西部': provinceDataSix['西部'],
+            // 新增港澳台区域
+            '港澳台': [
+                { name: '澳门', value: 451183 },
+                { name: '香港', value: 355255 },
+                { name: '台湾', value: 231285 }
+            ]
+        };
         // 区域颜色配置 - 使用和谐配色方案
         var colorConfig = {
             '华东': {
@@ -416,75 +447,114 @@
             '西部': {
                 main: '#8EE88E', // 浅草绿
                 sub: ['#A1F5A1', '#B5F9B5', '#C9FCC9', '#DDFEDD', '#F0FFF0', '#F5FFF5', '#F8FFF8']
+            },
+            '港澳台': {
+                main: '#FFD700', // 金色
+                sub: ['#FFEC8B', '#FFF68F', '#FFFACD']
             }
         };
-        
+
         // 计算统计数据
         function calculateStats() {
-            // 计算最高和最低人均GDP
-            let allProvinces = [];
-            Object.values(provinceData).forEach(provinces => {
-                allProvinces = allProvinces.concat(provinces);
-            });
-            
-            let highest = Math.max(...allProvinces.map(p => p.value));
-            let lowest = Math.min(...allProvinces.map(p => p.value));
-            let avg = areaData.reduce((sum, area) => sum + area.value, 0) / areaData.length;
-            
-            document.getElementById('highestGDP').textContent = highest.toLocaleString('zh-CN');
-            document.getElementById('lowestGDP').textContent = lowest.toLocaleString('zh-CN');
-            document.getElementById('avgGDP').textContent = Math.round(avg).toLocaleString('zh-CN');
-        }
-        
+    var currentProvinceData = getCurrentProvinceData();
+    
+    // 计算最高和最低人均GDP
+    let allProvinces = [];
+    Object.values(currentProvinceData).forEach(provinces => {
+        allProvinces = allProvinces.concat(provinces);
+    });
+    
+    let highest = Math.max(...allProvinces.map(p => p.value));
+    let lowest = Math.min(...allProvinces.map(p => p.value));
+    
+    // 计算区域平均值（正确计算）
+    var currentAreaData = getCurrentAreaData();
+    let avg = currentAreaData.reduce((sum, area) => sum + area.value, 0) / currentAreaData.length;
+    
+    // 更新省份总数
+    var totalProvinces = allProvinces.length;
+    
+    // 更新DOM
+    document.getElementById('highestGDP').textContent = highest.toLocaleString('zh-CN');
+    document.getElementById('lowestGDP').textContent = lowest.toLocaleString('zh-CN');
+    document.getElementById('avgGDP').textContent = Math.round(avg).toLocaleString('zh-CN');
+    
+    // 更新包含省份总数的显示（找到正确的元素）
+    var totalSpan = document.querySelector('.stats-info .stat-item:last-child .stat-value');
+    if (totalSpan) {
+        totalSpan.textContent = totalProvinces;
+    }
+    
+    // 更新数据说明
+    var noteText = includeHKMT ? 
+        '注：数据包含中国34个省级行政区（含港澳台）' : 
+        '注：数据包含中国大陆31个省级行政区（不含港澳台）';
+    document.getElementById('dataNote').textContent = noteText;
+}
+
         // 动态计算图表配置
         function createOption(isProvinceView, currentArea) {
             var containerWidth = document.getElementById('gdpPieChart').offsetWidth;
             var containerHeight = document.getElementById('gdpPieChart').offsetHeight;
-            
+
+            // 获取当前数据
+            var currentAreaData = getCurrentAreaData();
+            var currentProvinceData = getCurrentProvinceData();
+
             // 根据容器大小动态调整
             var isSmallScreen = containerWidth < 768;
             var titleFontSize = Math.max(14, Math.min(20, containerWidth / 30));
             var labelFontSize = Math.max(10, Math.min(14, containerWidth / 50));
             var legendFontSize = Math.max(9, Math.min(12, containerWidth / 60));
-            
+
             // 根据屏幕大小调整图例位置和饼图半径
             var legendOrient = isSmallScreen ? 'horizontal' : 'vertical';
             var legendLeft = isSmallScreen ? 'center' : 10;
             var legendTop = isSmallScreen ? 'bottom' : 'middle';
             var legendBottom = isSmallScreen ? 10 : undefined;
             var legendRight = isSmallScreen ? undefined : 10;
-            
+
             // 饼图半径设置 - 根据是否为省份视图调整
-            var pieRadius = isSmallScreen ? 
-                (isProvinceView ? ['25%', '60%'] : ['30%', '65%']) : 
+            var pieRadius = isSmallScreen ?
+                (isProvinceView ? ['25%', '60%'] : ['30%', '65%']) :
                 (isProvinceView ? ['35%', '75%'] : ['30%', '70%']);
-            
-            // 标题和副标题
-            var titleText = isProvinceView ? `${currentArea}省份人均GDP分布` : '2023年中国六大区域人均GDP分布';
-            var subtext = isProvinceView ? '点击任意位置返回区域视图' : '点击区域查看省份详情';
-            
+
+            // 根据当前模式设置标题
+            var regionCount = includeHKMT ? '七大' : '六大';
+            var provinceCount = includeHKMT ? 34 : 31; // 包含港澳台共34个，不包含31个
+
+            var titleText = isProvinceView ?
+                `${currentArea}省份人均GDP分布` :
+                `2023年中国${regionCount}区域人均GDP分布`;
+
+            var subtext = isProvinceView ?
+                '点击任意位置返回区域视图' :
+                '点击区域查看省份详情';
+
             // 获取当前显示的数据
-            var displayData = isProvinceView ? provinceData[currentArea] : areaData;
-            
+            var displayData = isProvinceView ?
+                currentProvinceData[currentArea] :
+                currentAreaData;
+
             return {
                 title: {
                     text: titleText,
                     left: 'center',
-                    textStyle: { 
-                        fontSize: titleFontSize, 
-                        fontWeight: 'bold', 
-                        color: '#2c3e50' 
+                    textStyle: {
+                        fontSize: titleFontSize,
+                        fontWeight: 'bold',
+                        color: '#2c3e50'
                     },
                     top: 10,
                     subtext: subtext,
-                    subtextStyle: { 
-                        fontSize: Math.max(9, titleFontSize - 4), 
-                        color: '#7f8c8d' 
+                    subtextStyle: {
+                        fontSize: Math.max(9, titleFontSize - 4),
+                        color: '#7f8c8d'
                     }
                 },
                 tooltip: {
                     trigger: 'item',
-                    formatter: function(params) {
+                    formatter: function (params) {
                         var value = params.value.toLocaleString('zh-CN');
                         var percent = params.percent;
                         return `<div style="font-weight: bold; margin-bottom: 5px;">${params.name}</div>
@@ -503,9 +573,9 @@
                     top: legendTop,
                     bottom: legendBottom,
                     right: legendRight,
-                    textStyle: { 
-                        fontSize: legendFontSize, 
-                        color: '#666' 
+                    textStyle: {
+                        fontSize: legendFontSize,
+                        color: '#666'
                     },
                     data: displayData.map(item => item.name),
                     itemWidth: 12,
@@ -529,7 +599,7 @@
                         borderColor: '#fff',
                         shadowBlur: 5,
                         shadowColor: 'rgba(0,0,0,0.1)',
-                        color: function(params) {
+                        color: function (params) {
                             if (isProvinceView) {
                                 // 省份视图：使用该区域子配色
                                 return colorConfig[currentArea].sub[params.dataIndex % colorConfig[currentArea].sub.length];
@@ -543,7 +613,7 @@
                         show: labelShow,
                         fontSize: labelFontSize,
                         color: '#555',
-                        formatter: function(params) {
+                        formatter: function (params) {
                             if (isSmallScreen) {
                                 return params.name + ': ' + params.percent + '%';
                             } else {
@@ -555,8 +625,8 @@
                         scale: true,
                         scaleSize: 10,
                         focus: 'self',
-                        itemStyle: { 
-                            shadowBlur: 15, 
+                        itemStyle: {
+                            shadowBlur: 15,
                             shadowColor: 'rgba(0,0,0,0.2)',
                             borderWidth: 3,
                             borderColor: '#fff'
@@ -571,26 +641,39 @@
                 }]
             };
         }
-        
+
         // 状态变量
         var currentArea = '';
         var isProvinceView = false;
         var labelShow = true;
         var legendShow = true;
-        
-        // 初始化区域标签
+        var includeHKMT = false;
+
+        // 获取当前使用的区域数据
+        function getCurrentAreaData() {
+            return includeHKMT ? areaDataSeven : areaDataSix;
+        }
+
+        // 获取当前使用的省份数据
+        function getCurrentProvinceData() {
+            return includeHKMT ? provinceDataSeven : provinceDataSix;
+        }
+
+        // 区域标签显示
         function initRegionTags() {
             var regionList = document.getElementById('regionList');
             regionList.innerHTML = '';
-            
-            areaData.forEach(area => {
+
+            var currentAreaData = getCurrentAreaData();
+
+            currentAreaData.forEach(area => {
                 var tag = document.createElement('div');
                 tag.className = 'region-tag';
                 if (currentArea === area.name) {
                     tag.classList.add('active');
                 }
                 tag.textContent = area.name;
-                tag.addEventListener('click', function() {
+                tag.addEventListener('click', function () {
                     currentArea = area.name;
                     isProvinceView = true;
                     updateRegionTags();
@@ -599,8 +682,8 @@
                 regionList.appendChild(tag);
             });
         }
-        
-        // 更新区域标签状态
+
+        // 区域标签状态
         function updateRegionTags() {
             var tags = document.querySelectorAll('.region-tag');
             tags.forEach(tag => {
@@ -611,26 +694,29 @@
                 }
             });
         }
-        
+
         // 渲染图表
         function renderChart() {
             myChart.setOption(createOption(isProvinceView, currentArea), true);
         }
-        
+
         // 初始化
         calculateStats();
-        initRegionTags();
+        initRegionTags();  // 改为调用新的函数
         renderChart();
-        
+
         // 图表点击事件
-        myChart.on('click', function(params) {
+        // 图表点击事件
+        myChart.on('click', function (params) {
+            var currentAreaData = getCurrentAreaData();
+
             // 1. 未选中区域时，点击区域→显示省份
-            if (!isProvinceView && areaData.some(item => item.name === params.name)) {
+            if (!isProvinceView && currentAreaData.some(item => item.name === params.name)) {
                 currentArea = params.name;
                 isProvinceView = true;
                 updateRegionTags();
                 renderChart();
-            } 
+            }
             // 2. 已选中区域时，点击任意位置→返回区域
             else {
                 currentArea = '';
@@ -639,45 +725,72 @@
                 renderChart();
             }
         });
-        
+
         // 控件功能
-        document.getElementById('toggleLabels').addEventListener('click', function() {
+        document.getElementById('toggleLabels').addEventListener('click', function () {
             labelShow = !labelShow;
             this.innerHTML = labelShow ? '<i class="icon">🏷️</i> 隐藏数据标签' : '<i class="icon">🏷️</i> 显示数据标签';
             renderChart();
         });
-        
-        document.getElementById('toggleLegend').addEventListener('click', function() {
+
+        document.getElementById('toggleLegend').addEventListener('click', function () {
             legendShow = !legendShow;
             this.innerHTML = legendShow ? '<i class="icon">📖</i> 隐藏图例' : '<i class="icon">📖</i> 显示图例';
             renderChart();
         });
-        
-        document.getElementById('resetView').addEventListener('click', function() {
+
+        // 港澳台切换按钮功能
+        document.getElementById('toggleHKMT').addEventListener('click', function () {
+            includeHKMT = !includeHKMT;
+
+            // 更新按钮文本
+            this.innerHTML = includeHKMT ?
+                '<i class="icon">🌟</i> 不含港澳台' :
+                '<i class="icon">🌟</i> 包含港澳台';
+
+            // 重置到区域视图
+            currentArea = '';
+            isProvinceView = false;
+
+            // 更新区域标签
+            initRegionTags();
+
+            // 重新计算统计数据和渲染图表
+            calculateStats();
+            renderChart();
+        });
+        // 重置视图功能
+        document.getElementById('resetView').addEventListener('click', function () {
             currentArea = '';
             isProvinceView = false;
             labelShow = true;
             legendShow = true;
+            includeHKMT = false; // 重置为不含港澳台
+
+            // 重置按钮文本
             document.getElementById('toggleLabels').innerHTML = '<i class="icon">🏷️</i> 隐藏数据标签';
             document.getElementById('toggleLegend').innerHTML = '<i class="icon">📖</i> 隐藏图例';
-            updateRegionTags();
+            document.getElementById('toggleHKMT').innerHTML = '<i class="icon">🌟</i> 包含港澳台';
+
+            initRegionTags();
+            calculateStats();
             renderChart();
         });
-        
+
         // 窗口自适应
         var resizeTimer;
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
+            resizeTimer = setTimeout(function () {
                 myChart.resize();
                 renderChart();
             }, 200);
         });
-        
+
         // 监听容器大小变化
         var chartContainer = document.getElementById('gdpPieChart');
         if (typeof ResizeObserver !== 'undefined') {
-            var observer = new ResizeObserver(function() {
+            var observer = new ResizeObserver(function () {
                 myChart.resize();
                 renderChart();
             });
@@ -685,4 +798,5 @@
         }
     </script>
 </body>
+
 </html>
